@@ -1,0 +1,14 @@
+SEQUÊNCIAS CONSECUTIVAS
+========================================
+  2 consecutivos:    13 sorteios (0.4%)
+  3 consecutivos:   450 sorteios (12.4%)
+  4 consecutivos:  1151 sorteios (31.6%)
+  5 consecutivos:   989 sorteios (27.2%)
+  6 consecutivos:   566 sorteios (15.5%)
+  7 consecutivos:   279 sorteios (7.7%)
+  8 consecutivos:   112 sorteios (3.1%)
+  9 consecutivos:    42 sorteios (1.2%)
+  10 consecutivos:    30 sorteios (0.8%)
+  11 consecutivos:     6 sorteios (0.2%)
+  12 consecutivos:     3 sorteios (0.1%)
+  14 consecutivos:     1 sorteios (0.0%)

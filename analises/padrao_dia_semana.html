@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<title>Padrão por Dia da Semana — Lotofácil</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+body { font-family: sans-serif; padding: 2rem; background: #f5f5f5; color: #333; }
+h1 { font-size: 20px; font-weight: 500; margin-bottom: 1rem; }
+.grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; margin-bottom: 1.5rem; }
+.num { border-radius: 8px; padding: 8px; text-align: center; cursor: pointer; }
+.num span { display: block; font-size: 13px; font-weight: 500; color: #fff; }
+.num small { font-size: 11px; color: rgba(255,255,255,0.85); }
+table { width: 100%; border-collapse: collapse; font-size: 12px; }
+th, td { padding: 5px 8px; }
+canvas { width: 100% !important; }
+.chart-box { background: #fff; border-radius: 8px; padding: 1rem; margin-bottom: 1.5rem; }
+</style>
+</head>
+<body>
+<h1>Lotofácil — Frequência por Dia da Semana</h1>
+<p style="font-size:13px;color:#888;">Clique num número para ver o detalhe</p>
+<div class="grid" id="numeros"></div>
+<div class="chart-box" id="detalhe" style="display:none;">
+  <div id="titulo" style="font-size:14px;font-weight:500;margin-bottom:10px;"></div>
+  <div style="position:relative;height:250px;"><canvas id="chartDia"></canvas></div>
+</div>
+<div class="chart-box">
+  <div style="font-size:13px;color:#888;margin-bottom:8px;">Heatmap geral</div>
+  <div id="heatmap"></div>
+</div>
+<script>
+const dias = ['Segunda','Terça','Quarta','Quinta','Sexta','Sábado'];
+const dados = [
+  {n:1,d:[63.1,62.5,60.5,59.9,56.7,60.3]},{n:2,d:[60.2,56.4,61.0,59.7,59.3,62.0]},
+  {n:3,d:[57.8,66.2,63.2,59.2,58.7,61.0]},{n:4,d:[60.2,61.1,60.6,60.8,58.7,65.2]},
+  {n:5,d:[60.1,61.5,58.2,58.6,60.7,61.3]},{n:6,d:[58.3,59.1,58.6,58.4,58.2,62.3]},
+  {n:7,d:[57.3,59.1,61.7,58.8,60.0,58.0]},{n:8,d:[57.7,55.7,55.2,59.7,61.3,56.1]},
+  {n:9,d:[61.3,61.8,58.3,58.4,58.4,60.3]},{n:10,d:[63.2,63.9,63.5,58.6,61.3,62.0]},
+  {n:11,d:[61.4,60.8,60.6,63.7,59.8,64.6]},{n:12,d:[61.3,57.1,60.5,62.1,57.4,60.7]},
+  {n:13,d:[61.5,64.5,61.6,61.4,58.4,58.7]},{n:14,d:[58.8,58.1,60.5,60.6,63.0,63.9]},
+  {n:15,d:[59.0,58.1,60.2,58.8,63.4,56.1]},{n:16,d:[57.6,57.4,57.9,58.4,58.8,49.8]},
+  {n:17,d:[60.2,55.1,58.7,55.5,59.5,61.6]},{n:18,d:[57.6,62.2,60.5,61.5,61.1,53.8]},
+  {n:19,d:[59.3,57.8,57.3,60.4,62.3,60.0]},{n:20,d:[61.7,62.2,62.5,62.5,62.7,66.2]},
+  {n:21,d:[61.1,57.4,55.4,63.9,59.1,57.4]},{n:22,d:[60.2,58.1,56.4,61.0,59.5,66.9]},
+  {n:23,d:[59.7,53.7,60.2,57.0,58.2,58.7]},{n:24,d:[60.0,63.9,62.3,60.1,62.0,54.1]},
+  {n:25,d:[61.2,66.2,64.8,61.0,61.5,59.0]}
+];
+function cor(p){return p>=64?'#D85A30':p>=62?'#e8845a':p>=60?'#1D9E75':p>=58?'#5DCAA5':'#3c89d0';}
+let chartAtual=null;
+const numDiv=document.getElementById('numeros');
+dados.forEach(d=>{
+  const avg=d.d.reduce((a,b)=>a+b,0)/d.d.length;
+  const el=document.createElement('div');
+  el.className='num';el.style.background=cor(avg);
+  el.innerHTML=`<span>Nº ${String(d.n).padStart(2,'0')}</span><small>${avg.toFixed(1)}%</small>`;
+  el.onclick=()=>{
+    document.getElementById('detalhe').style.display='block';
+    document.getElementById('titulo').textContent=`Número ${String(d.n).padStart(2,'0')} — frequência por dia`;
+    if(chartAtual)chartAtual.destroy();
+    chartAtual=new Chart(document.getElementById('chartDia'),{
+      type:'bar',data:{labels:dias,datasets:[{data:d.d,backgroundColor:d.d.map(v=>cor(v)),borderRadius:4}]},
+      options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},
+        scales:{y:{min:48,max:68,ticks:{callback:v=>v+'%'}},x:{}}}
+    });
+  };
+  numDiv.appendChild(el);
+});
+let html='<table><tr><th style="text-align:left">Nº</th>';
+dias.forEach(d=>{html+=`<th>${d.substring(0,3)}</th>`;});
+html+='</tr>';
+dados.forEach(d=>{
+  html+=`<tr><td><b>${String(d.n).padStart(2,'0')}</b></td>`;
+  d.d.forEach(v=>{html+=`<td style="text-align:center;background:${cor(v)};color:#fff;border-radius:3px;">${v.toFixed(1)}</td>`;});
+  html+='</tr>';
+});
+html+='</table>';
+document.getElementById('heatmap').innerHTML=html;
+</script>
+</body>
+</html>

@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<title>Parceiros do Número 01 — Lotofácil</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+body{font-family:sans-serif;padding:2rem;background:#f5f5f5;color:#333;}
+h1{font-size:20px;font-weight:500;margin-bottom:1rem;}
+.cards{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:1.5rem;}
+.card{background:#fff;border-radius:8px;padding:0.75rem;text-align:center;}
+.card small{display:block;font-size:12px;color:#888;}
+.card strong{font-size:20px;}
+.chart-box{background:#fff;border-radius:8px;padding:1rem;margin-bottom:1.5rem;}
+.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;}
+.item{background:#f0f0f0;border-radius:6px;padding:6px 8px;display:flex;align-items:center;gap:6px;font-size:12px;}
+</style>
+</head>
+<body>
+<h1>Parceiros do Número 01 — Lotofácil</h1>
+<div class="cards">
+  <div class="card"><small>Concursos com 01</small><strong>2.207</strong></div>
+  <div class="card"><small>Melhor parceiro</small><strong>10 <span style="font-size:13px;color:#888">61.0%</span></strong></div>
+  <div class="card"><small>Pior parceiro</small><strong>16 <span style="font-size:13px;color:#888">55.1%</span></strong></div>
+</div>
+<div class="chart-box">
+  <div style="position:relative;height:280px;"><canvas id="chart"></canvas></div>
+</div>
+<div class="chart-box">
+  <div style="font-size:13px;color:#888;margin-bottom:8px;">Ranking</div>
+  <div class="grid" id="ranking"></div>
+</div>
+<script>
+const p=[
+  {n:2,v:1290,p:58.5},{n:3,v:1292,p:58.5},{n:4,v:1304,p:59.1},{n:5,v:1280,p:58.0},
+  {n:6,v:1250,p:56.6},{n:7,v:1257,p:57.0},{n:8,v:1235,p:56.0},{n:9,v:1282,p:58.1},
+  {n:10,v:1347,p:61.0},{n:11,v:1317,p:59.7},{n:12,v:1292,p:58.5},{n:13,v:1321,p:59.9},
+  {n:14,v:1302,p:59.0},{n:15,v:1311,p:59.4},{n:16,v:1217,p:55.1},{n:17,v:1275,p:57.8},
+  {n:18,v:1276,p:57.8},{n:19,v:1280,p:58.0},{n:20,v:1336,p:60.5},{n:21,v:1263,p:57.2},
+  {n:22,v:1274,p:57.7},{n:23,v:1260,p:57.1},{n:24,v:1312,p:59.4},{n:25,v:1325,p:60.0}
+];
+function cor(v){return v>=60?'#D85A30':v>=58?'#1D9E75':'#3c89d0';}
+new Chart(document.getElementById('chart'),{
+  type:'bar',
+  data:{labels:p.map(d=>String(d.n).padStart(2,'0')),datasets:[{data:p.map(d=>d.p),backgroundColor:p.map(d=>cor(d.p)),borderRadius:4}]},
+  options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},
+    scales:{y:{min:53,max:63,ticks:{callback:v=>v+'%'}},x:{ticks:{autoSkip:false}}}}
+});
+const sorted=[...p].sort((a,b)=>b.p-a.p);
+const r=document.getElementById('ranking');
+sorted.forEach((d,i)=>{
+  const el=document.createElement('div');
+  el.className='item';
+  el.innerHTML=`<span style="color:#888;min-width:16px;">${i+1}º</span><span style="font-weight:500;color:${cor(d.p)};">01+${String(d.n).padStart(2,'0')}</span><span style="margin-left:auto;color:#888;">${d.p}%</span>`;
+  r.appendChild(el);
+});
+</script>
+</body>
+</html>

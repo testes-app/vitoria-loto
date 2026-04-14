@@ -1,0 +1,22 @@
+TOP 20 PARES MAIS FREQUENTES
+===================================
+  11 + 20: 1389 vezes
+  10 + 25: 1386 vezes
+  10 + 20: 1378 vezes
+  13 + 20: 1378 vezes
+  20 + 25: 1371 vezes
+  14 + 20: 1363 vezes
+  10 + 11: 1356 vezes
+  12 + 25: 1350 vezes
+  09 + 10: 1349 vezes
+  01 + 10: 1347 vezes
+  10 + 14: 1345 vezes
+  11 + 25: 1343 vezes
+  24 + 25: 1343 vezes
+  10 + 12: 1342 vezes
+  10 + 24: 1341 vezes
+  18 + 20: 1341 vezes
+  12 + 20: 1340 vezes
+  03 + 25: 1338 vezes
+  04 + 11: 1338 vezes
+  02 + 25: 1337 vezes

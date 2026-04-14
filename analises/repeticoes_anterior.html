@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<title>Repeticoes do Sorteio Anterior - Lotofacil</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+body{font-family:sans-serif;padding:2rem;background:#f5f5f5;color:#333;}
+h1{font-size:20px;font-weight:500;margin-bottom:.5rem;}
+p{font-size:13px;color:#888;margin-bottom:1rem;}
+.cards{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:1.5rem;}
+.card{background:#fff;border-radius:8px;padding:.75rem;text-align:center;}
+.card small{display:block;font-size:12px;color:#888;}
+.card strong{font-size:20px;}
+.box{background:#fff;border-radius:8px;padding:1rem;margin-bottom:1.5rem;}
+.legenda{display:flex;gap:16px;font-size:12px;color:#888;margin-bottom:8px;flex-wrap:wrap;}
+.leg{display:flex;align-items:center;gap:4px;}
+.dot{width:10px;height:10px;border-radius:2px;}
+.tabs{display:flex;gap:8px;margin-bottom:1rem;flex-wrap:wrap;}
+.tab{padding:6px 16px;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500;border:2px solid #ddd;background:#fff;}
+.tab.ativo{background:#D85A30;color:#fff;border-color:#D85A30;}
+.grid5{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;}
+.num{border-radius:8px;padding:8px;text-align:center;}
+.num span{display:block;font-size:13px;font-weight:600;color:#fff;}
+.num small{font-size:11px;color:rgba(255,255,255,.9);}
+.sorteio{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px;}
+.bola{width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:#fff;}
+.titulo-sorteio{font-size:13px;font-weight:500;margin-bottom:6px;}
+.legenda-bolas{display:flex;gap:16px;font-size:12px;color:#888;margin:12px 0;}
+.atraso-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:1.2rem;}
+.atraso-card{border-radius:10px;padding:14px;text-align:center;color:#fff;}
+.atraso-card .num-big{font-size:32px;font-weight:700;line-height:1;}
+.atraso-card .label{font-size:12px;margin-top:4px;opacity:.85;}
+.atraso-card .concursos{font-size:13px;font-weight:500;margin-top:2px;}
+.grid-atraso{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin-top:1rem;}
+.bola-atraso{border-radius:10px;padding:10px 6px;text-align:center;}
+.bola-atraso .n{font-size:16px;font-weight:700;color:#fff;line-height:1;}
+.bola-atraso .a{font-size:11px;color:rgba(255,255,255,.85);margin-top:3px;}
+.bola-atraso .barra{height:4px;border-radius:2px;background:rgba(255,255,255,.3);margin-top:6px;overflow:hidden;}
+.bola-atraso .fill{height:100%;border-radius:2px;background:rgba(255,255,255,.8);}
+</style>
+</head>
+<body>
+<h1>Lotofacil - Repeticoes do Sorteio Anterior</h1>
+<p>Analise completa de quantos numeros se repetem e quais sao os mais fieis</p>
+<div class="cards">
+  <div class="card"><small>Mais comum</small><strong>9 <span style="font-size:13px;color:#888">32.7%</span></strong></div>
+  <div class="card"><small>8 ou 9 repeticoes</small><strong>78.7%</strong></div>
+  <div class="card"><small>Mais fiel</small><strong>20 <span style="font-size:13px;color:#888">62.7%</span></strong></div>
+  <div class="card"><small>Menos fiel</small><strong>16 <span style="font-size:13px;color:#888">57.2%</span></strong></div>
+</div>
+<div class="tabs">
+  <div class="tab ativo" onclick="mostrarTab(1,this)">Ultimos sorteios</div>
+  <div class="tab" onclick="mostrarTab(2,this)">Quantidade de repeticoes</div>
+  <div class="tab" onclick="mostrarTab(3,this)">Numeros mais fieis</div>
+  <div class="tab" onclick="mostrarTab(4,this)">Atraso dos numeros</div>
+</div>
+<div id="tab1">
+  <div class="box">
+    <div class="titulo-sorteio">Concurso 3655 - 07/04/2026 (anterior)</div>
+    <div class="sorteio" id="bolas_anterior"></div>
+    <div style="margin-top:1.5rem;" class="titulo-sorteio">Concurso 3656 - 08/04/2026 (atual)</div>
+    <div class="sorteio" id="bolas_atual"></div>
+    <div class="legenda-bolas">
+      <div class="leg"><div class="dot" style="background:#D85A30;border-radius:50%;width:12px;height:12px;"></div>Repetiu</div>
+      <div class="leg"><div class="dot" style="background:#1D9E75;border-radius:50%;width:12px;height:12px;"></div>Novo</div>
+      <div class="leg"><div class="dot" style="background:#3c89d0;border-radius:50%;width:12px;height:12px;"></div>Saiu</div>
+    </div>
+    <div style="background:#f5f5f5;border-radius:8px;padding:12px;font-size:13px;line-height:1.8;">
+      <strong>8 repetiram:</strong> [4, 6, 11, 12, 18, 19, 21, 24]<br>
+      <strong>7 novos:</strong> [3, 7, 8, 14, 15, 20, 25]<br>
+      <strong>7 sairam:</strong> [1, 2, 5, 10, 17, 22, 23]
+    </div>
+  </div>
+</div>
+<div id="tab2" style="display:none;">
+  <div class="box">
+    <div class="legenda">
+      <div class="leg"><div class="dot" style="background:#D85A30"></div>Zona quente (8-10)</div>
+      <div class="leg"><div class="dot" style="background:#1D9E75"></div>Normal (7-11)</div>
+      <div class="leg"><div class="dot" style="background:#3c89d0"></div>Raro</div>
+    </div>
+    <div style="position:relative;height:300px;"><canvas id="chart1"></canvas></div>
+  </div>
+</div>
+<div id="tab3" style="display:none;">
+  <div class="box">
+    <div class="legenda">
+      <div class="leg"><div class="dot" style="background:#D85A30"></div>Muito fiel (+62%)</div>
+      <div class="leg"><div class="dot" style="background:#1D9E75"></div>Normal</div>
+      <div class="leg"><div class="dot" style="background:#3c89d0"></div>Menos fiel</div>
+    </div>
+    <div style="position:relative;height:300px;"><canvas id="chart2"></canvas></div>
+  </div>
+  <div class="box">
+    <div style="font-size:13px;color:#888;margin-bottom:8px;">Ranking dos mais fieis</div>
+    <div class="grid5" id="grid2"></div>
+  </div>
+</div>
+<div id="tab4" style="display:none;">
+  <div class="box">
+    <div style="font-size:13px;color:#888;margin-bottom:12px;">Sorteios sem aparecer ate o concurso 3656</div>
+    <div class="atraso-cards" id="top3-atraso"></div>
+    <div class="legenda" style="margin-bottom:10px;">
+      <div class="leg"><div class="dot" style="background:#1D9E75"></div>Apareceu agora (0)</div>
+      <div class="leg"><div class="dot" style="background:#3c89d0"></div>Pouco atrasado (1-3)</div>
+      <div class="leg"><div class="dot" style="background:#BA7517"></div>Atrasado (4-6)</div>
+      <div class="leg"><div class="dot" style="background:#D85A30"></div>Muito atrasado (7+)</div>
+    </div>
+    <div style="position:relative;height:280px;margin-bottom:1rem;"><canvas id="chart-atraso"></canvas></div>
+    <div style="font-size:13px;color:#888;margin-bottom:8px;">Todos os numeros</div>
+    <div class="grid-atraso" id="grade-atraso"></div>
+  </div>
+</div>
+<script>
+function corRep(k){return k>=8&&k<=10?"#D85A30":k>=7&&k<=11?"#1D9E75":"#3c89d0";}
+function corNum(p){return p>=37?"#D85A30":p>=35?"#1D9E75":"#3c89d0";}
+function corAtraso(a){return a===0?"#1D9E75":a<=3?"#3c89d0":a<=6?"#BA7517":"#D85A30";}
+function labelAtraso(a){return a===0?"Em dia":a===1?"1 sorteio":a+" sorteios";}
+function mostrarTab(n,el){
+  [1,2,3,4].forEach(i=>document.getElementById("tab"+i).style.display="none");
+  document.querySelectorAll(".tab").forEach(t=>t.classList.remove("ativo"));
+  document.getElementById("tab"+n).style.display="";
+  el.classList.add("ativo");
+}
+const ant=[1, 2, 4, 5, 6, 10, 11, 12, 17, 18, 19, 21, 22, 23, 24], atu=[3, 4, 6, 7, 8, 11, 12, 14, 15, 18, 19, 20, 21, 24, 25], rep=[4, 6, 11, 12, 18, 19, 21, 24], sai=[1, 2, 5, 10, 17, 22, 23];
+ant.forEach(n=>{
+  const b=document.createElement("div");
+  b.className="bola";
+  b.style.background=rep.includes(n)?"#3c89d0":"#aaa";
+  b.textContent=String(n).padStart(2,"0");
+  document.getElementById("bolas_anterior").appendChild(b);
+});
+atu.forEach(n=>{
+  const b=document.createElement("div");
+  b.className="bola";
+  b.style.background=rep.includes(n)?"#D85A30":"#1D9E75";
+  b.textContent=String(n).padStart(2,"0");
+  document.getElementById("bolas_atual").appendChild(b);
+});
+const repLabels=[5, 6, 7, 8, 9, 10, 11, 12, 13, 14], repData=[1, 51, 346, 890, 1197, 791, 311, 60, 7, 1], repPct=[0.0, 1.4, 9.5, 24.4, 32.7, 21.6, 8.5, 1.6, 0.2, 0.0];
+new Chart(document.getElementById("chart1"),{type:"bar",data:{labels:repLabels.map(k=>k+" rep"),datasets:[{data:repData,backgroundColor:repLabels.map(k=>corRep(k)),borderRadius:6}]},options:{plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>repPct[ctx.dataIndex]+"% ("+ctx.raw+" sorteios)"}}}  ,scales:{y:{beginAtZero:true}}}});
+const fidNums=[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25], fidVals=[59.6, 60.1, 59.4, 59.9, 60.0, 58.3, 57.4, 58.1, 59.5, 61.5, 61.6, 59.6, 61.1, 60.7, 59.5, 57.2, 59.0, 58.9, 59.7, 62.7, 60.7, 58.6, 58.0, 60.4, 62.6];
+new Chart(document.getElementById("chart2"),{type:"bar",data:{labels:fidNums.map(n=>"N"+String(n).padStart(2,"0")),datasets:[{data:fidVals,backgroundColor:fidVals.map(v=>corNum(v)),borderRadius:6}]},options:{plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>ctx.raw+"%"}}}  ,scales:{y:{beginAtZero:true,max:100}}}});
+const fidSorted=[...fidNums].sort((a,b)=>fidVals[b-1]-fidVals[a-1]);
+const g2=document.getElementById("grid2");
+fidSorted.forEach(n=>{
+  const pct=fidVals[n-1],cor=corNum(pct);
+  g2.innerHTML+=`<div class="num" style="background:${cor}"><span>${String(n).padStart(2,"0")}</span><small>${pct}%</small></div>`;
+});
+const atrNums=[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25], atrVals=[1, 1, 0, 0, 1, 0, 0, 0, 7, 1, 0, 0, 3, 0, 0, 3, 1, 0, 0, 0, 0, 1, 1, 0, 0];
+const top3=[[9, 7], [13, 3], [16, 3]];
+const t3=document.getElementById("top3-atraso");
+top3.forEach(([n,a])=>{
+  t3.innerHTML+=`<div class="atraso-card" style="background:${corAtraso(a)}"><div class="num-big">${String(n).padStart(2,"0")}</div><div class="label">Numero</div><div class="concursos">${labelAtraso(a)}</div></div>`;
+});
+const maxAtr=Math.max(...atrVals)||1;
+new Chart(document.getElementById("chart-atraso"),{type:"bar",data:{labels:atrNums.map(n=>"N"+String(n).padStart(2,"0")),datasets:[{data:atrVals,backgroundColor:atrVals.map(a=>corAtraso(a)),borderRadius:6}]},options:{plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>labelAtraso(ctx.raw)}}}  ,scales:{y:{beginAtZero:true}}}});
+const ga=document.getElementById("grade-atraso");
+atrNums.forEach((n,i)=>{
+  const a=atrVals[i],cor=corAtraso(a),pct=Math.round(a/maxAtr*100);
+  ga.innerHTML+=`<div class="bola-atraso" style="background:${cor}"><div class="n">${String(n).padStart(2,"0")}</div><div class="a">${labelAtraso(a)}</div><div class="barra"><div class="fill" style="width:${pct}%"></div></div></div>`;
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,145 @@
+# Configurações do Super Lotofácil
+
+# Banco de Dados
+database:
+  type: "sqlite" # sqlite, postgresql
+  sqlite_path: "data/lotofacil.db"
+  postgresql:
+    host: "localhost"
+    port: 5432
+    database: "lotofacil"
+    user: "postgres"
+    password: "password"
+
+# Scraper (Coleta de Dados)
+scraper:
+  base_url: "https://loteriascaixa-api.herokuapp.com/api/lotofacil/"
+  update_interval: "daily" # daily, weekly, manual
+  cache_enabled: true
+  cache_dir: "data/cache"
+  retry_attempts: 3
+  timeout: 30
+
+# Analyzer (Análise Estatística)
+analyzer:
+  default_lookback: 500 # Últimos N concursos para análise
+  min_frequency_threshold: 0.01
+  correlation_method: "pearson" # pearson, spearman
+  enable_temporal_analysis: true
+
+# Generator (Gerador de Fechamentos)
+generator:
+  parallel_workers: 8 # Número de processos paralelos
+  cache_combinations: true
+  max_memory_gb: 4
+  optimization_method: "genetic" # genetic, brute_force, heuristic
+
+  # Configurações de algoritmo genético
+  genetic:
+    population_size: 100
+    generations: 50
+    mutation_rate: 0.1
+    crossover_rate: 0.7
+
+# Scorer (Sistema de Pontuação)
+scorer:
+  min_score: 0
+  max_score: 100
+
+  # Pesos dos critérios (devem somar 1.0)
+  weights:
+    frequency: 0.30 # Frequência histórica
+    correlation: 0.20 # Correlação entre números
+    distribution: 0.30 # Distribuição (par/ímpar, alto/baixo)
+    patterns: 0.20 # Padrões específicos
+
+  # Penalidades
+  penalties:
+    all_even: -20
+    all_odd: -20
+    all_low: -15
+    all_high: -15
+    too_many_consecutive: -10
+
+# Simulator (Backtesting)
+simulator:
+  default_test_range: 100 # Últimos N concursos para teste
+  calculate_roi: true
+  calculate_statistics: true
+  save_results: true
+  results_dir: "data/results"
+
+# Machine Learning
+ml:
+  enabled: true
+  models:
+    - "random_forest"
+    - "xgboost"
+    - "lightgbm"
+
+  train_test_split: 0.8
+  cross_validation_folds: 5
+  feature_engineering: true
+
+  # Hiperparâmetros Random Forest
+  random_forest:
+    n_estimators: 100
+    max_depth: 10
+    min_samples_split: 5
+
+  # Hiperparâmetros XGBoost
+  xgboost:
+    n_estimators: 100
+    learning_rate: 0.1
+    max_depth: 6
+
+# Interface Web
+web:
+  framework: "streamlit" # streamlit, dash
+  host: "localhost"
+  port: 8501
+  theme: "light" # light, dark
+  auto_refresh: false
+  refresh_interval: 300 # segundos
+
+# Logging
+logging:
+  level: "INFO" # DEBUG, INFO, WARNING, ERROR
+  format: "{time:YYYY-MM-DD HH:mm:ss} | {level} | {message}"
+  file: "logs/super_lotofacil.log"
+  rotation: "10 MB"
+  retention: "30 days"
+
+# Filtros Padrão para Fechamentos
+default_filters:
+  pares_min: 6
+  pares_max: 9
+  impares_min: 6
+  impares_max: 9
+  consecutivos_max: 3
+  primos_min: 4
+  primos_max: 8
+  soma_min: 120
+  soma_max: 200
+
+# Notificações (opcional)
+notifications:
+  enabled: false
+  email:
+    smtp_server: "smtp.gmail.com"
+    smtp_port: 587
+    sender: "seu@email.com"
+    password: "sua_senha"
+    recipients:
+      - "destinatario@email.com"
+
+  telegram:
+    bot_token: "seu_token"
+    chat_id: "seu_chat_id"
+
+# Performance
+performance:
+  enable_profiling: false
+  cache_size_mb: 1024
+  use_gpu: false # Se disponível
+  num_threads: -1 # -1 = auto-detect

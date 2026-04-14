@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<title>Frequencia Geral — Lotofacil</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+body{font-family:sans-serif;padding:2rem;background:#f5f5f5;color:#333;}
+h1{font-size:20px;font-weight:500;margin-bottom:0.5rem;}
+p{font-size:13px;color:#888;margin-bottom:1rem;}
+.cards{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:1.5rem;}
+.card{background:#fff;border-radius:8px;padding:0.75rem;text-align:center;}
+.card small{display:block;font-size:12px;color:#888;}
+.card strong{font-size:20px;}
+.box{background:#fff;border-radius:8px;padding:1rem;margin-bottom:1.5rem;}
+.legenda{display:flex;gap:16px;font-size:12px;color:#888;margin-bottom:8px;}
+.leg{display:flex;align-items:center;gap:4px;}
+.dot{width:10px;height:10px;border-radius:2px;}
+.grid{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;}
+.num{border-radius:8px;padding:8px;text-align:center;}
+.num span{display:block;font-size:13px;font-weight:600;color:#fff;}
+.num small{font-size:11px;color:rgba(255,255,255,0.9);}
+</style>
+</head>
+<body>
+<h1>Lotofacil — Frequencia Geral dos 25 Numeros</h1>
+<p>Base: 3642 concursos historicos (out/2003 a mar/2026)</p>
+<div class="cards">
+  <div class="card"><small>Total concursos</small><strong>3.642</strong></div>
+  <div class="card"><small>Mais frequente</small><strong>20 <span style="font-size:13px;color:#888">62.6%</span></strong></div>
+  <div class="card"><small>Menos frequente</small><strong>16 <span style="font-size:13px;color:#888">57.3%</span></strong></div>
+  <div class="card"><small>Media geral</small><strong>59.9%</strong></div>
+</div>
+<div class="box">
+  <div class="legenda">
+    <div class="leg"><div class="dot" style="background:#D85A30"></div>Quente (+61%)</div>
+    <div class="leg"><div class="dot" style="background:#1D9E75"></div>Normal (59-61%)</div>
+    <div class="leg"><div class="dot" style="background:#3c89d0"></div>Frio (-59%)</div>
+  </div>
+  <div style="position:relative;height:340px;"><canvas id="chart"></canvas></div>
+</div>
+<div class="box">
+  <div style="font-size:13px;color:#888;margin-bottom:8px;">Ranking por frequencia</div>
+  <div class="grid" id="grid"></div>
+</div>
+<script>
+function cor(p){return p>=61?"#D85A30":p>=59?"#1D9E75":"#3c89d0";}
+const dados=[[1, 2207, 60.6], [2, 2184, 60.0], [3, 2191, 60.2], [4, 2206, 60.6], [5, 2179, 59.8], [6, 2141, 58.8], [7, 2152, 59.1], [8, 2109, 57.9], [9, 2174, 59.7], [10, 2263, 62.1], [11, 2240, 61.5], [12, 2190, 60.1], [13, 2218, 60.9], [14, 2206, 60.6], [15, 2175, 59.7], [16, 2088, 57.3], [17, 2141, 58.8], [18, 2166, 59.5], [19, 2171, 59.6], [20, 2279, 62.6], [21, 2165, 59.4], [22, 2181, 59.9], [23, 2132, 58.5], [24, 2209, 60.7], [25, 2263, 62.1]];
+new Chart(document.getElementById("chart"),{
+  type:"bar",
+  data:{
+    labels:dados.map(d=>String(d[0]).padStart(2,"0")),
+    datasets:[{data:dados.map(d=>d[2]),backgroundColor:dados.map(d=>cor(d[2])),borderRadius:4}]
+  },
+  options:{
+    responsive:true,maintainAspectRatio:false,
+    plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>" "+dados[ctx.dataIndex][1]+" vezes ("+ctx.raw+"%)"}}},
+    scales:{
+      y:{min:55,max:64,ticks:{callback:v=>v+"%"},grid:{color:"rgba(0,0,0,0.06)"}},
+      x:{ticks:{autoSkip:false,font:{size:12}}}
+    }
+  }
+});
+const g=document.getElementById("grid");
+[...dados].sort((a,b)=>b[2]-a[2]).forEach((d,i)=>{
+  const el=document.createElement("div");
+  el.className="num";el.style.background=cor(d[2]);
+  el.innerHTML="<span>"+(i+1)+"º  Nº "+String(d[0]).padStart(2,"0")+"</span><small>"+d[1]+" vezes  "+d[2]+"%</small>";
+  g.appendChild(el);
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,189 @@
+
+╔══════════════════════════════════════════════════════╗
+║    🤖 LOTOFÁCIL PRO — AUTOMAÇÃO COMPLETA             ║
+║    Fluxo: Dados → Treino → Jogos → Email             ║
+╚══════════════════════════════════════════════════════╝
+  [07:52:41] ⚡ Fluxo rápido — só jogos...
+  [07:52:41] 📡 ETAPA 1 — Atualizando dados...
+  [07:52:42] ✅ Dados já atualizados.
+  [07:52:42] 🏆 ETAPA 4 — Gerando jogos Super Combo Turbo...
+WARNING: All log messages before absl::InitializeLog() is called are written to STDERR
+I0000 00:00:1774090375.263738    2314 port.cc:153] oneDNN custom operations are on. You may see slightly different numerical results due to floating-point round-off errors from different computation orders. To turn them off, set the environment variable `TF_ENABLE_ONEDNN_OPTS=0`.
+I0000 00:00:1774090375.270656    2314 cudart_stub.cc:31] Could not find cuda drivers on your machine, GPU will not be used.
+I0000 00:00:1774090375.961053    2314 cpu_feature_guard.cc:227] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.
+To enable the following instructions: AVX2 AVX512F AVX512_VNNI FMA, in other operations, rebuild TensorFlow with the appropriate compiler flags.
+WARNING: All log messages before absl::InitializeLog() is called are written to STDERR
+I0000 00:00:1774090378.855125    2314 port.cc:153] oneDNN custom operations are on. You may see slightly different numerical results due to floating-point round-off errors from different computation orders. To turn them off, set the environment variable `TF_ENABLE_ONEDNN_OPTS=0`.
+I0000 00:00:1774090378.858641    2314 cudart_stub.cc:31] Could not find cuda drivers on your machine, GPU will not be used.
+E0000 00:00:1774090379.787176    2314 cuda_platform.cc:52] failed call to cuInit: INTERNAL: CUDA error: Failed call to cuInit: UNKNOWN ERROR (303)
+  [07:53:01]    Ranking carregado: 1000 combinações
+  [07:53:07] ✅ 10 jogos gerados e salvos!
+  Jogo 01: 01  04  08  09  10  12  13  15  16  17  20  21  22  24  25
+  Jogo 02: 01  03  04  08  09  10  13  15  16  17  20  21  22  24  25
+  Jogo 03: 01  03  04  05  08  09  10  13  15  16  17  20  21  22  25
+  Jogo 04: 01  02  03  07  08  09  10  13  15  16  17  20  21  22  24
+  Jogo 05: 03  04  06  08  10  12  13  15  16  17  20  21  22  24  25
+  Jogo 06: 01  02  03  07  08  10  13  14  15  16  17  20  21  22  24
+  Jogo 07: 03  04  05  08  09  10  13  15  16  18  20  21  22  24  25
+  Jogo 08: 01  03  04  07  08  10  13  15  16  17  18  19  21  22  25
+  Jogo 09: 03  04  07  08  09  10  13  15  16  17  20  22  23  24  25
+  Jogo 10: 01  02  03  04  08  09  13  15  16  17  20  21  22  24  25
+  [07:53:07] 📧 ETAPA 6 — Enviando relatório por email...
+  ✅ Email enviado para cornelio0654@gmail.com!
+  [07:53:11] ✅ Email enviado com sucesso!
+
+╔══════════════════════════════════════════════════════╗
+║    🤖 LOTOFÁCIL PRO — AUTOMAÇÃO COMPLETA             ║
+║    Fluxo: Dados → Treino → Jogos → Email             ║
+╚══════════════════════════════════════════════════════╝
+  [20:22:27] ⚡ Fluxo rápido — só jogos...
+  [20:22:27] 📡 ETAPA 1 — Atualizando dados...
+  [20:22:28] ✅ Dados já atualizados.
+  [20:22:28] 🏆 ETAPA 4 — Gerando jogos Super Combo Turbo...
+WARNING: All log messages before absl::InitializeLog() is called are written to STDERR
+I0000 00:00:1774221758.881448    3571 port.cc:153] oneDNN custom operations are on. You may see slightly different numerical results due to floating-point round-off errors from different computation orders. To turn them off, set the environment variable `TF_ENABLE_ONEDNN_OPTS=0`.
+I0000 00:00:1774221758.885336    3571 cudart_stub.cc:31] Could not find cuda drivers on your machine, GPU will not be used.
+I0000 00:00:1774221759.056715    3571 cpu_feature_guard.cc:227] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.
+To enable the following instructions: AVX2 AVX512F AVX512_VNNI FMA, in other operations, rebuild TensorFlow with the appropriate compiler flags.
+WARNING: All log messages before absl::InitializeLog() is called are written to STDERR
+I0000 00:00:1774221761.209091    3571 port.cc:153] oneDNN custom operations are on. You may see slightly different numerical results due to floating-point round-off errors from different computation orders. To turn them off, set the environment variable `TF_ENABLE_ONEDNN_OPTS=0`.
+I0000 00:00:1774221761.212759    3571 cudart_stub.cc:31] Could not find cuda drivers on your machine, GPU will not be used.
+E0000 00:00:1774221761.986194    3571 cuda_platform.cc:52] failed call to cuInit: INTERNAL: CUDA error: Failed call to cuInit: UNKNOWN ERROR (303)
+  [20:22:43]    Ranking carregado: 1000 combinações
+  [20:22:46] ✅ 10 jogos gerados e salvos!
+  Jogo 01: 01  02  04  07  08  10  13  15  17  18  19  20  22  23  24
+  Jogo 02: 01  02  04  07  08  09  10  13  14  17  19  20  22  24  25
+  Jogo 03: 02  04  06  07  08  12  13  15  16  17  20  21  22  23  25
+  Jogo 04: 01  03  04  07  08  09  13  15  17  19  20  21  22  23  24
+  Jogo 05: 01  02  06  07  08  09  10  12  15  17  19  20  21  22  24
+  Jogo 06: 01  02  04  08  09  10  13  15  17  19  20  22  23  24  25
+  Jogo 07: 01  02  04  07  08  09  10  13  15  16  17  19  20  22  23
+  Jogo 08: 01  02  07  08  09  10  13  15  16  18  19  20  22  23  25
+  Jogo 09: 01  04  05  07  08  12  13  15  16  17  19  20  22  23  25
+  Jogo 10: 01  02  04  08  09  10  13  14  17  19  20  22  23  24  25
+  [20:22:46] 📧 ETAPA 6 — Enviando relatório por email...
+  ✅ Email enviado para cornelio0654@gmail.com!
+  [20:22:50] ✅ Email enviado com sucesso!
+
+╔══════════════════════════════════════════════════════╗
+║    🤖 LOTOFÁCIL PRO — AUTOMAÇÃO COMPLETA             ║
+║    Fluxo: Dados → Treino → Jogos → Email             ║
+╚══════════════════════════════════════════════════════╝
+  [20:30:01] ⚡ Fluxo rápido — só jogos...
+  [20:30:01] 📡 ETAPA 1 — Atualizando dados...
+  [20:30:02] ✅ Dados já atualizados.
+  [20:30:02] 🏆 ETAPA 4 — Gerando jogos Super Combo Turbo...
+  [20:30:16]    Ranking carregado: 1000 combinações
+  [20:30:20] ✅ 10 jogos gerados e salvos!
+  Jogo 01: 01  02  05  07  09  10  13  14  16  17  18  20  21  22  25
+  Jogo 02: 01  02  04  07  09  10  12  13  16  19  20  21  22  24  25
+  Jogo 03: 01  02  04  06  07  09  10  13  16  17  18  19  20  21  25
+  Jogo 04: 01  02  04  07  09  10  13  16  17  19  20  21  22  24  25
+  Jogo 05: 02  04  07  08  10  12  14  15  16  17  18  19  20  21  22
+  Jogo 06: 01  02  05  07  09  10  13  16  17  19  20  21  22  24  25
+  Jogo 07: 02  04  06  07  09  13  16  17  19  20  21  22  23  24  25
+  Jogo 08: 01  02  03  04  07  09  10  13  16  17  19  20  21  23  24
+  Jogo 09: 01  02  08  09  10  13  15  16  17  19  20  21  22  24  25
+  Jogo 10: 01  02  03  04  05  07  09  10  13  15  16  19  21  24  25
+  [20:30:20] 📧 ETAPA 6 — Enviando relatório por email...
+  ✅ Email enviado para cornelio0654@gmail.com!
+  [20:30:24] ✅ Email enviado com sucesso!
+
+╔══════════════════════════════════════════════════════╗
+║    🤖 LOTOFÁCIL PRO — AUTOMAÇÃO COMPLETA             ║
+║    Fluxo: Dados → Treino → Jogos → Email             ║
+╚══════════════════════════════════════════════════════╝
+  [21:34:31] ⚡ Fluxo rápido — só jogos...
+  [21:34:31] 📡 ETAPA 1 — Atualizando dados...
+  [21:34:32] ✅ Dados já atualizados.
+  [21:34:32] 🏆 ETAPA 4 — Gerando jogos Super Combo Turbo...
+WARNING: All log messages before absl::InitializeLog() is called are written to STDERR
+I0000 00:00:1774398882.776938    3140 port.cc:153] oneDNN custom operations are on. You may see slightly different numerical results due to floating-point round-off errors from different computation orders. To turn them off, set the environment variable `TF_ENABLE_ONEDNN_OPTS=0`.
+I0000 00:00:1774398882.778916    3140 cudart_stub.cc:31] Could not find cuda drivers on your machine, GPU will not be used.
+I0000 00:00:1774398882.835656    3140 cpu_feature_guard.cc:227] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.
+To enable the following instructions: AVX2 AVX512F AVX512_VNNI FMA, in other operations, rebuild TensorFlow with the appropriate compiler flags.
+WARNING: All log messages before absl::InitializeLog() is called are written to STDERR
+I0000 00:00:1774398885.284126    3140 port.cc:153] oneDNN custom operations are on. You may see slightly different numerical results due to floating-point round-off errors from different computation orders. To turn them off, set the environment variable `TF_ENABLE_ONEDNN_OPTS=0`.
+I0000 00:00:1774398885.285814    3140 cudart_stub.cc:31] Could not find cuda drivers on your machine, GPU will not be used.
+E0000 00:00:1774398886.166336    3140 cuda_platform.cc:52] failed call to cuInit: INTERNAL: CUDA error: Failed call to cuInit: UNKNOWN ERROR (303)
+  [21:34:47]    Ranking carregado: 1000 combinações
+  [21:34:52] ✅ 10 jogos gerados e salvos!
+  Jogo 01: 01  02  04  07  08  09  10  13  16  17  19  20  21  22  24
+  Jogo 02: 01  02  04  05  06  08  09  13  16  17  19  20  21  22  24
+  Jogo 03: 01  02  04  07  09  10  13  16  17  19  20  21  22  24  25
+  Jogo 04: 01  02  04  06  07  09  10  13  16  17  19  21  22  24  25
+  Jogo 05: 01  02  04  07  09  10  12  13  17  18  20  21  22  23  24
+  Jogo 06: 01  02  04  06  07  09  10  13  17  19  20  21  22  24  25
+  Jogo 07: 01  02  07  09  10  11  13  16  17  19  20  21  22  24  25
+  Jogo 08: 01  02  04  07  08  09  13  16  17  19  20  21  22  24  25
+  Jogo 09: 01  02  03  04  07  09  10  12  13  19  20  21  22  24  25
+  Jogo 10: 01  02  04  06  07  08  13  15  16  17  19  20  22  24  25
+  [21:34:52] 📧 ETAPA 6 — Enviando relatório por email...
+  ✅ Email enviado para cornelio0654@gmail.com!
+  [21:34:55] ✅ Email enviado com sucesso!
+
+╔══════════════════════════════════════════════════════╗
+║    🤖 LOTOFÁCIL PRO — AUTOMAÇÃO COMPLETA             ║
+║    Fluxo: Dados → Treino → Jogos → Email             ║
+╚══════════════════════════════════════════════════════╝
+  [20:30:02] ⚡ Fluxo rápido — só jogos...
+  [20:30:02] 📡 ETAPA 1 — Atualizando dados...
+  [20:30:03] ✅ Dados já atualizados.
+  [20:30:03] 🏆 ETAPA 4 — Gerando jogos Super Combo Turbo...
+  [20:30:27]    Ranking carregado: 1000 combinações
+  [20:30:31] ✅ 10 jogos gerados e salvos!
+  Jogo 01: 04  05  06  07  09  12  13  15  16  18  19  21  23  24  25
+  Jogo 02: 01  02  04  05  07  09  13  15  18  20  21  22  23  24  25
+  Jogo 03: 04  05  06  07  12  13  15  16  17  18  20  21  23  24  25
+  Jogo 04: 01  02  04  05  06  07  09  12  13  15  16  18  20  21  23
+  Jogo 05: 04  05  06  07  08  09  12  13  15  16  17  18  21  24  25
+  Jogo 06: 03  04  05  06  07  09  10  12  13  15  16  20  21  23  24
+  Jogo 07: 03  04  05  07  09  12  13  15  16  18  20  21  23  24  25
+  Jogo 08: 04  05  06  07  08  09  12  13  15  18  20  21  23  24  25
+  Jogo 09: 04  05  06  07  09  12  13  15  16  18  20  21  23  24  25
+  Jogo 10: 01  02  04  05  06  07  08  09  12  13  15  18  20  23  24
+  [20:30:31] 📧 ETAPA 6 — Enviando relatório por email...
+  ✅ Email enviado para cornelio0654@gmail.com!
+  [20:30:35] ✅ Email enviado com sucesso!
+
+╔══════════════════════════════════════════════════════╗
+║    🤖 LOTOFÁCIL PRO — AUTOMAÇÃO COMPLETA             ║
+║    Fluxo: Dados → Treino → Jogos → Email             ║
+╚══════════════════════════════════════════════════════╝
+  [22:16:45] ⚡ Fluxo rápido — só jogos...
+  [22:16:45] 📡 ETAPA 1 — Atualizando dados...
+  [22:16:47] ✅ 1 novos sorteios baixados!
+  [22:16:47] 🏆 ETAPA 4 — Gerando jogos Super Combo Turbo...
+
+╔══════════════════════════════════════════════════════╗
+║    🤖 LOTOFÁCIL PRO — AUTOMAÇÃO COMPLETA             ║
+║    Fluxo: Dados → Treino → Jogos → Email             ║
+╚══════════════════════════════════════════════════════╝
+  [16:51:14] ⚡ Fluxo rápido — só jogos...
+  [16:51:14] 📡 ETAPA 1 — Atualizando dados...
+  [16:51:16] ✅ Dados já atualizados.
+  [16:51:16] 🏆 ETAPA 4 — Gerando jogos Super Combo Turbo...
+WARNING: All log messages before absl::InitializeLog() is called are written to STDERR
+I0000 00:00:1775332291.439679     631 port.cc:153] oneDNN custom operations are on. You may see slightly different numerical results due to floating-point round-off errors from different computation orders. To turn them off, set the environment variable `TF_ENABLE_ONEDNN_OPTS=0`.
+I0000 00:00:1775332291.447303     631 cudart_stub.cc:31] Could not find cuda drivers on your machine, GPU will not be used.
+I0000 00:00:1775332292.163341     631 cpu_feature_guard.cc:227] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.
+To enable the following instructions: AVX2 AVX512F AVX512_VNNI FMA, in other operations, rebuild TensorFlow with the appropriate compiler flags.
+WARNING: All log messages before absl::InitializeLog() is called are written to STDERR
+I0000 00:00:1775332297.146222     631 port.cc:153] oneDNN custom operations are on. You may see slightly different numerical results due to floating-point round-off errors from different computation orders. To turn them off, set the environment variable `TF_ENABLE_ONEDNN_OPTS=0`.
+I0000 00:00:1775332297.151566     631 cudart_stub.cc:31] Could not find cuda drivers on your machine, GPU will not be used.
+E0000 00:00:1775332298.630954     631 cuda_platform.cc:52] failed call to cuInit: INTERNAL: CUDA error: Failed call to cuInit: UNKNOWN ERROR (303)
+  [16:51:39]    Ranking carregado: 1000 combinações
+  [16:51:44] ✅ 10 jogos gerados e salvos!
+  Jogo 01: 02  03  04  05  09  10  12  14  16  17  20  21  23  24  25
+  Jogo 02: 03  04  05  07  08  09  11  12  14  16  17  20  21  24  25
+  Jogo 03: 02  03  04  09  11  12  13  14  16  17  18  20  23  24  25
+  Jogo 04: 01  02  05  06  09  11  12  13  16  17  20  21  23  24  25
+  Jogo 05: 02  03  04  05  07  09  11  12  16  17  20  21  23  24  25
+  Jogo 06: 02  03  05  08  09  10  11  12  14  17  20  21  23  24  25
+  Jogo 07: 03  04  05  08  09  11  12  14  15  16  17  21  23  24  25
+  Jogo 08: 02  03  04  05  09  10  11  12  14  17  20  21  23  24  25
+  Jogo 09: 02  03  04  05  09  11  12  14  16  17  20  21  23  24  25
+  Jogo 10: 02  03  05  06  09  11  12  14  15  16  17  20  23  24  25
+  [16:51:44] 📧 ETAPA 6 — Enviando relatório por email...
+  ❌ Erro ao enviar email: (535, b'5.7.8 Username and Password not accepted. For more information, go to\n5.7.8  https://support.google.com/mail/?p=BadCredentials 71dfb90a1353d-56d9ba80290sm10822024e0c.3 - gsmtp')
+  [16:51:47] ⚠️  Falha no envio — verifique configuração (opção 33 no menu).

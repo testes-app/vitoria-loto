@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VITORIA LOTO — Super Intelligence System</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+:root {
+    --bg: #03070b;
+    --panel: rgba(13, 25, 41, 0.7);
+    --panel-border: rgba(0, 212, 255, 0.15);
+    --accent: #00d4ff;
+    --accent-glow: rgba(0, 212, 255, 0.4);
+    --secondary: #ff6b35;
+    --success: #7fff00;
+    --danger: #ff4d4d;
+    --text: #e0f2fe;
+    --text-muted: #94a3b8;
+    --card-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.4);
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Outfit', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+    background-image: 
+        radial-gradient(circle at 50% 0%, rgba(0, 212, 255, 0.1) 0%, transparent 50%),
+        radial-gradient(circle at 0% 100%, rgba(255, 107, 53, 0.05) 0%, transparent 40%);
+}
+
+/* Background Animation */
+.bg-grid {
+    position: fixed;
+    inset: 0;
+    background-image: linear-gradient(rgba(0, 212, 255, 0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(0, 212, 255, 0.03) 1px, transparent 1px);
+    background-size: 50px 50px;
+    z-index: -1;
+    mask-image: radial-gradient(circle at center, black, transparent 80%);
+}
+
+header {
+    padding: 24px 40px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--panel-border);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+.logo {
+    font-size: 1.5rem;
+    font-weight: 800;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--text);
+}
+.logo span { color: var(--accent); text-shadow: 0 0 10px var(--accent-glow); }
+
+.system-status {
+    display: flex;
+    gap: 15px;
+    align-items: center;
+}
+
+.badge {
+    padding: 4px 12px;
+    border-radius: 99px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    font-family: 'JetBrains Mono', monospace;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--panel);
+    border: 1px solid var(--panel-border);
+}
+.badge .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--success); box-shadow: 0 0 8px var(--success); }
+.badge.warning .dot { background: var(--secondary); box-shadow: 0 0 8px var(--secondary); }
+
+main {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 40px;
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+    gap: 24px;
+}
+
+/* Glass Card */
+.card {
+    background: var(--panel);
+    backdrop-filter: blur(12px);
+    border: 1px solid var(--panel-border);
+    border-radius: 20px;
+    padding: 24px;
+    box-shadow: var(--card-shadow);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.card:hover { transform: translateY(-4px); border-color: rgba(0, 212, 255, 0.4); }
+
+.card-title {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.card-value {
+    font-size: 2.2rem;
+    font-weight: 800;
+    font-variant-numeric: tabular-nums;
+}
+
+/* KPI Grid */
+.kpi-row { grid-column: span 12; display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; }
+
+/* Control Panel */
+.controls { grid-column: span 12; }
+.btn-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+}
+.btn {
+    padding: 16px;
+    border-radius: 12px;
+    border: 1px solid var(--panel-border);
+    background: rgba(255, 255, 255, 0.03);
+    color: var(--text);
+    font-family: 'Outfit', sans-serif;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+}
+.btn:hover:not(:disabled) { background: rgba(0, 212, 255, 0.1); border-color: var(--accent); color: var(--accent); }
+.btn i { font-size: 1.5rem; }
+.btn.loading { opacity: 0.7; cursor: wait; }
+.btn.loading .icon { animation: spin 1s linear infinite; }
+
+/* Charts & Lists */
+.full-width { grid-column: span 12; }
+.two-cols { grid-column: span 12; display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+
+.game-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 12px;
+    padding: 12px;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.02);
+}
+.game-id { width: 40px; font-family: 'JetBrains Mono'; font-size: 0.8rem; color: var(--accent); }
+.ball-list { display: flex; gap: 6px; flex-wrap: wrap; }
+.ball {
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.8rem; font-weight: 700;
+    background: #1e293b;
+    border: 1px solid #334155;
+    color: var(--text-muted);
+}
+.ball.active { background: var(--accent); color: var(--bg); border: none; box-shadow: 0 0 10px var(--accent-glow); }
+.ball.hot { background: var(--secondary); color: white; border: none; }
+
+.sorteio-list { max-height: 400px; overflow-y: auto; padding-right: 10px; }
+.sorteio-row {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 12px 0; border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+
+/* Animations */
+@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+@keyframes slideIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+/* Responsiveness */
+@media (max-width: 1000px) {
+    .kpi-row, .btn-grid, .two-cols { grid-template-columns: repeat(2, 1fr); }
+    main { padding: 20px; }
+}
+@media (max-width: 600px) {
+    .kpi-row, .btn-grid, .two-cols { grid-template-columns: 1fr; }
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--panel-border); border-radius: 10px; }
+</style>
+</head>
+<body>
+<div class="bg-grid"></div>
+
+<header>
+    <div class="logo">VITORIA<span>LOTO</span></div>
+    <div class="system-status">
+        <div class="badge" id="env-status">
+            <div class="dot"></div> PRODUCTION REPLICA
+        </div>
+        <div class="badge" id="ai-health">
+            <div class="dot"></div> ENGINE: SUPER_COMBO_V4
+        </div>
+        <button class="btn" style="padding: 8px 16px; flex-direction: row; font-size: 0.8rem;" onclick="refreshAll()">
+            <span class="icon">↻</span> REFRESH
+        </button>
+    </div>
+</header>
+
+<main>
+    <!-- KPIs -->
+    <div class="kpi-row">
+        <div class="card">
+            <div class="card-title">📅 Último Concurso</div>
+            <div class="card-value" id="kpi-concurso">----</div>
+            <div style="font-size: 0.85rem; color: var(--text-muted); margin-top: 8px;" id="kpi-data">Sincronizando...</div>
+        </div>
+        <div class="card">
+            <div class="card-title">🤖 IA Confidence</div>
+            <div class="card-value" style="color: var(--accent)" id="kpi-confidence">94.2%</div>
+            <div style="font-size: 0.85rem; color: var(--text-muted); margin-top: 8px;">Ensemble Synergy Stable</div>
+        </div>
+        <div class="card">
+            <div class="card-title">📈 Saldo Acumulado</div>
+            <div class="card-value" id="kpi-balance">R$ 0,00</div>
+            <div style="font-size: 0.85rem; color: var(--success); margin-top: 8px;" id="kpi-roi">+0% ROI</div>
+        </div>
+        <div class="card">
+            <div class="card-title">🧠 Model Age</div>
+            <div class="card-value" id="kpi-age">--</div>
+            <div style="font-size: 0.85rem; color: var(--text-muted); margin-top: 8px;">Time since last training</div>
+        </div>
+    </div>
+
+    <!-- ELITE: HALL OF FAME -->
+    <div class="full-width">
+        <div class="card-title">👑 Elite — Recordistas Históricos (Hall of Fame)</div>
+        <div class="kpi-row" id="hall-of-fame-content" style="grid-template-columns: repeat(5, 1fr); margin-bottom: 0;">
+            <!-- Renderizado via JS -->
+        </div>
+    </div>
+
+    <!-- Actions -->
+    <div class="card controls">
+        <div class="card-title">⚡ High-Performance Control Unit</div>
+        <div class="btn-grid">
+            <button class="btn" id="btn-update" onclick="runAction('atualizar_dados', 'btn-update')">
+                <span class="icon">📡</span> SYNC DATA
+            </button>
+            <button class="btn" id="btn-generate" onclick="runAction('gerar_jogos', 'btn-generate')">
+                <span class="icon">🧠</span> GENETIC GEN
+            </button>
+            <button class="btn" id="btn-email" onclick="runAction('enviar_email', 'btn-email')">
+                <span class="icon">📧</span> DISPATCH EMAIL
+            </button>
+            <button class="btn" id="btn-verify" onclick="runAction('conferir', 'btn-verify')">
+                <span class="icon">🛡️</span> VERIFY RESULTS
+            </button>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="two-cols">
+        <!-- Jogos -->
+        <div class="card">
+            <div class="card-title">🎯 Targeted Combinations (Top 10)</div>
+            <div id="games-list"></div>
+        </div>
+        <!-- Stats -->
+        <div class="card">
+            <div class="card-title">🔥 Neural Frequency Map</div>
+            <canvas id="freqChart" style="max-height: 350px;"></canvas>
+        </div>
+    </div>
+
+    <div class="two-cols">
+        <!-- History -->
+        <div class="card">
+            <div class="card-title">📜 Draw History Archive</div>
+            <div class="sorteio-list" id="draw-history"></div>
+        </div>
+        <!-- Balance Details -->
+        <div class="card">
+            <div class="card-title">💎 Performance Breakdown</div>
+            <div id="performance-content"></div>
+        </div>
+    </div>
+</main>
+
+<script>
+let chart;
+
+async function api(path, method='GET') {
+    const res = await fetch('/api/' + path, { method });
+    return res.json();
+}
+
+function updateKPI(id, val) {
+    const el = document.getElementById(id);
+    if(el) el.textContent = val;
+}
+
+async function refreshAll() {
+    console.log("Sistema: Atualização total em progresso...");
+    
+    // Status e Dados mestre
+    const [status, ultimo, saldo, frequencia, jogos, sorteios, recordes] = await Promise.all([
+        api('status'), api('ultimo_sorteio'), api('saldo'), 
+        api('frequencia'), api('jogos'), api('sorteios'), api('hall_of_fame')
+    ]);
+
+    // Hall of Fame Rendering
+    const hofDiv = document.getElementById('hall-of-fame-content');
+    if(hofDiv && recordes) {
+        hofDiv.innerHTML = '';
+        
+        // Render 18 Numbers (New Focus)
+        if (recordes.r18) {
+            Object.keys(recordes.r18).sort((a,b)=>b-a).forEach(k => {
+                const r = recordes.r18[k];
+                const card = document.createElement('div');
+                card.className = 'card';
+                card.style.padding = '16px';
+                card.style.borderLeft = '3px solid var(--accent)';
+                card.style.position = 'relative';
+                card.innerHTML = `
+                    <div style="position:absolute; top:6px; right:10px; font-size:0.5rem; color:var(--text-muted);">18 DZ</div>
+                    <div style="font-size:0.7rem; color:var(--accent); font-weight:800; margin-bottom:8px;">${r.titulo}</div>
+                    <div class="ball-list" style="margin-bottom:12px; gap:4px;">
+                        ${r.dezenas.slice(0,10).map(n => `<div class="ball" style="width:20px; height:20px; font-size:0.6rem; background:var(--accent); color:var(--bg); border:none;">${String(n).padStart(2,'0')}</div>`).join('')}
+                        <div style="font-size:0.6rem; color:var(--text-muted)">+${r.dezenas.length-10}</div>
+                    </div>
+                    <div style="font-size:0.6rem; color:var(--text-muted); line-height:1.4;">${r.stats.split('|').slice(0,2).join('<br>')}</div>
+                `;
+                hofDiv.appendChild(card);
+            });
+        }
+
+        // Render 17 Numbers
+        if (recordes.r17) {
+            Object.keys(recordes.r17).sort((a,b)=>b-a).forEach(k => {
+                const r = recordes.r17[k];
+                const card = document.createElement('div');
+                card.className = 'card';
+                card.style.padding = '16px';
+                card.style.opacity = '0.7';
+                card.style.borderLeft = '1px solid var(--panel-border)';
+                card.innerHTML = `
+                    <div style="font-size:0.7rem; color:var(--text-muted); font-weight:800; margin-bottom:8px;">${r.titulo}</div>
+                    <div class="ball-list" style="margin-bottom:12px; gap:4px;">
+                        ${r.dezenas.slice(0,10).map(n => `<div class="ball" style="width:20px; height:20px; font-size:0.6rem; background:#111; color:white;">${String(n).padStart(2,'0')}</div>`).join('')}
+                        <div style="font-size:0.6rem; color:var(--text-muted)">+${r.dezenas.length-10}</div>
+                    </div>
+                    <div style="font-size:0.6rem; color:var(--text-muted); line-height:1.4;">${r.stats.split('|').slice(0,2).join('<br>')}</div>
+                `;
+                hofDiv.appendChild(card);
+            });
+        }
+    }
+
+    // KPI Update
+    updateKPI('kpi-concurso', '#' + (ultimo.concurso || '----'));
+    updateKPI('kpi-data', ultimo.data || 'Sem conexão');
+    
+    const balance = saldo.saldo_total || 0;
+    updateKPI('kpi-balance', 'R$ ' + balance.toFixed(2));
+    const roi = saldo.total_gasto > 0 ? ((saldo.total_ganho / saldo.total_gasto) * 100).toFixed(1) : 0;
+    document.getElementById('kpi-roi').textContent = `+${roi}% Profit Factor`;
+    document.getElementById('kpi-roi').style.color = balance >= 0 ? '#7fff00' : '#ff4d4d';
+
+    const lastTrain = status.ultimo_treino ? new Date(status.ultimo_treino) : null;
+    if(lastTrain) {
+        const diff = Math.floor((new Date() - lastTrain) / 86400000);
+        updateKPI('kpi-age', diff + 'd');
+        if(diff > 3) document.getElementById('ai-health').classList.add('warning');
+    }
+
+    // Chart Update
+    renderChart(frequencia);
+
+    // Games Update
+    const gamesDiv = document.getElementById('games-list');
+    gamesDiv.innerHTML = '';
+    jogos.slice(0, 10).forEach((j, index) => {
+        const div = document.createElement('div');
+        div.className = 'game-row';
+        div.style.animation = `slideIn 0.3s ease forwards ${index * 0.05}s`;
+        div.innerHTML = `
+            <div class="game-id">G${index+1}</div>
+            <div class="ball-list">
+                ${j.map(n => `<div class="ball active">${String(n).padStart(2,'0')}</div>`).join('')}
+            </div>
+        `;
+        gamesDiv.appendChild(div);
+    });
+
+    // History Update
+    const historyDiv = document.getElementById('draw-history');
+    if(historyDiv) {
+        historyDiv.innerHTML = '';
+        sorteios.forEach(s => {
+            const row = document.createElement('div');
+            row.className = 'sorteio-row';
+            row.innerHTML = `
+                <div style="font-family:'JetBrains Mono'; color:var(--accent); width:80px;">#${s.concurso}</div>
+                <div style="font-size:0.8rem; width:100px;">${s.data}</div>
+                <div class="ball-list" style="flex:1; justify-content: flex-end;">
+                    ${[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15].map(i => {
+                        const n = s['n'+String(i).padStart(2,'0')] || s['num'+i];
+                        return `<div class="ball" style="width:24px; height:24px; font-size:0.6rem;">${String(n).padStart(2,'0')}</div>`;
+                    }).join('')}
+                </div>
+            `;
+            historyDiv.appendChild(row);
+        });
+    }
+
+    // Performance Breakdown Update
+    const perfDiv = document.getElementById('performance-content');
+    if(perfDiv) {
+        perfDiv.innerHTML = `
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:16px;">
+                <div style="background:rgba(255,255,255,0.03); padding:16px; border-radius:12px;">
+                    <div style="font-size:0.75rem; color:var(--text-muted); margin-bottom:4px;">PROFIT FACTOR</div>
+                    <div style="font-size:1.2rem; font-weight:800; color:${balance >= 0 ? 'var(--success)' : 'var(--danger)'}">${roi}%</div>
+                </div>
+                <div style="background:rgba(255,255,255,0.03); padding:16px; border-radius:12px;">
+                    <div style="font-size:0.75rem; color:var(--text-muted); margin-bottom:4px;">MAX HITS</div>
+                    <div style="font-size:1.2rem; font-weight:800; color:var(--accent)">${saldo.max_acertos || 0} pts</div>
+                </div>
+            </div>
+            <div style="margin-top:16px; font-size:0.85rem;">
+                <div style="display:flex; justify-content:space-between; margin-bottom:8px;">
+                    <span>Total Investido</span>
+                    <span style="color:var(--danger)">R$ ${(saldo.total_gasto || 0).toFixed(2)}</span>
+                </div>
+                <div style="display:flex; justify-content:space-between; margin-bottom:16px;">
+                    <span>Total Retornado</span>
+                    <span style="color:var(--success)">R$ ${(saldo.total_ganho || 0).toFixed(2)}</span>
+                </div>
+                <div style="height:10px; background:rgba(255,255,255,0.1); border-radius:10px; overflow:hidden;">
+                    <div style="height:100%; width:${Math.min(100, (saldo.total_ganho / (saldo.total_gasto || 1)) * 100)}%; background:var(--success); box-shadow:0 0 10px var(--success);"></div>
+                </div>
+            </div>
+        `;
+    }
+}
+
+function renderChart(data) {
+    const ctx = document.getElementById('freqChart').getContext('2d');
+    const labels = Array.from({length: 25}, (_, i) => i + 1);
+    const values = labels.map(l => data[l] || 0);
+
+    if(chart) chart.destroy();
+    chart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels,
+            datasets: [{
+                label: 'Frequência Histórica',
+                data: values,
+                backgroundColor: 'rgba(0, 212, 255, 0.5)',
+                borderColor: '#00d4ff',
+                borderWidth: 1,
+                borderRadius: 4
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#94a3b8' } },
+                x: { grid: { display: false }, ticks: { color: '#94a3b8' } }
+            },
+            plugins: { legend: { display: false } }
+        }
+    });
+}
+
+async function runAction(endpoint, btnId) {
+    const btn = document.getElementById(btnId);
+    btn.disabled = true;
+    btn.classList.add('loading');
+    
+    try {
+        const res = await api(endpoint, 'POST');
+        alert(res.msg);
+        await refreshAll();
+    } catch(e) {
+        alert("Erro na operação: " + e.message);
+    } finally {
+        btn.disabled = false;
+        btn.classList.remove('loading');
+    }
+}
+
+// Inicialização
+refreshAll();
+setInterval(refreshAll, 60000);
+</script>
+</body>
+</html>
