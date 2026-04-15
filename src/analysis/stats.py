@@ -1010,71 +1010,238 @@ def exibir_ciclo_unificado(df: pd.DataFrame, dados_hall: dict, k: str):
     
     print(f"\n{Fore.CYAN}{'═'*64}{Style.RESET_ALL}")
 
+def calcular_ciclos_pro(df: pd.DataFrame, dados_halls: dict):
+    """
+    Motor de Ciclos v1.0: Calcula a maturidade dos ciclos internos de todas as elites.
+    Retorna dados estruturados para CLI e Web.
+    """
+    num_cols = [f"n{i:02d}" for i in range(1, 16)]
+    sorteios = [set(int(row[c]) for c in num_cols) for _, row in df.iterrows()]
+    concursos = sorted(df['concurso'].tolist())
+    
+    resultados = {}
+    for e in ["17", "18", "19", "20"]:
+        if e not in dados_halls: continue
+        resultados[e] = {}
+        
+        for k in ["15", "14", "13", "12", "11"]:
+            if k not in dados_halls[e]: continue
+            target = set(dados_halls[e][k]["dezenas"])
+            
+            # Encontrar início do ciclo atual
+            vistos = set()
+            inicio_conc = concursos[0]
+            for i in range(len(sorteios)-1, -1, -1):
+                vistos.update(sorteios[i] & target)
+                if vistos == target:
+                    if i < len(concursos)-1:
+                        inicio_conc = concursos[i+1]
+                    else:
+                        inicio_conc = concursos[-1]
+                    break
+            
+            # Recalcular vistos desde o início encontrado
+            vistos_desde_inicio = set()
+            count = 0
+            for i in range(len(concursos)):
+                if concursos[i] >= inicio_conc:
+                    vistos_desde_inicio.update(sorteios[i] & target)
+                    count += 1
+            
+            faltam = sorted(list(target - vistos_desde_inicio))
+            
+            resultados[e][k] = {
+                "titulo": dados_halls[e][k]["titulo"],
+                "inicio": inicio_conc,
+                "concursos": count,
+                "faltam": faltam,
+                "n_faltam": len(faltam)
+            }
+    return resultados
+
 def exibir_resumo_ciclos_completo(df: pd.DataFrame, dados_hall: dict, label: str = "18 DZ"):
     """
-    Exibe um resumo tabular dos ciclos de todos os Reis (17 ou 18 DZ).
+    Exibe um resumo tabular dos ciclos de todos os Reis de uma elite específica.
     """
+    e_key = label.split(" ")[0] # 17, 18, 19, 20
+    halls_temp = {e_key: dados_hall}
+    full_data = calcular_ciclos_pro(df, halls_temp)
+    data = full_data.get(e_key, {})
+
     print(f"\n{Fore.CYAN}╔{'═'*72}╗")
     print(f"║ 📊 RESUMO GERAL DE CICLOS INTERNOS — OS REIS DE {label:<10}       ║")
     print(f"╚{'═'*72}╝{Style.RESET_ALL}")
-    
-    num_cols = [f"n{i:02d}" for i in range(1, 16)]
-    sorteios = []
-    for _, row in df.iterrows():
-        sorteios.append(set(int(row[c]) for c in num_cols))
     
     print(f"\n  {'REI':<15} │ {'INÍCIO':<6} │ {'CONC':<4} │ {'FALTA':<4} │ {'DEZENAS PENDENTES'}")
     print(f"  {'─'*15}─┼─{'─'*6}─┼─{'─'*4}─┼─{'─'*4}─┼─{'─'*30}")
 
     for k in ["15", "14", "13", "12", "11"]:
-        if k not in dados_hall: continue
+        if k not in data: continue
+        res = data[k]
         
-        rei = dados_hall[k]
-        target = set(rei["dezenas"])
+        n_faltam = res["n_faltam"]
+        cor_falta = Fore.RED if 0 < n_faltam <= 3 else (Fore.GREEN if n_faltam == 0 else Fore.YELLOW)
         
-        # Calcular ciclo atual
-        vistos = set()
-        inicio = 0
-        concursos = sorted(df['concurso'].tolist())
-        
-        # Modo rápido: de trás para frente até fechar
-        for i in range(len(sorteios)-1, -1, -1):
-            vistos.update(sorteios[i] & target)
-            if vistos == target:
-                inicio = concursos[i+1] if i < len(concursos)-1 else concursos[-1]
-                break
-        
-        if inicio == 0: inicio = concursos[0]
-        
-        # Recalcular vistos desde o inicio
-        vistos_desde_inicio = set()
-        count = 0
-        for i in range(len(concursos)):
-            if concursos[i] >= inicio:
-                vistos_desde_inicio.update(sorteios[i] & target)
-                count += 1
-        
-        faltam = target - vistos_desde_inicio
-        n_faltam = len(faltam)
-        
-        # Cores para o status
-        cor_falta = Fore.RED if n_faltam <= 3 and n_faltam > 0 else (Fore.GREEN if n_faltam == 0 else Fore.YELLOW)
-        status_txt = f"{n_faltam:02d}"
-        
-        dz_pendentes = " ".join(f"{d:02d}" for d in sorted(list(faltam)))
+        dz_pendentes = " ".join(f"{d:02d}" for d in res["faltam"])
         if not dz_pendentes: dz_pendentes = f"{Fore.GREEN}CICLO COMPLETO ✅{Style.RESET_ALL}"
         
-        print(f"  {rei['titulo']:15} │ {inicio:<6} │ {count:4d} │ {cor_falta}{status_txt:4} {Style.RESET_ALL} │ {dz_pendentes}")
+        print(f"  {res['titulo']:15} │ {res['inicio']:<6} │ {res['concursos']:4d} │ {cor_falta}{n_faltam:02d}   {Style.RESET_ALL} │ {dz_pendentes}")
 
     print(f"\n  {Fore.YELLOW}Legenda: INÍCIO = Concurso que começou | CONC = Sorteios passados | FALTA = Qtd dezenas pendentes{Style.RESET_ALL}")
     print(f"  {Fore.CYAN}{'═'*74}{Style.RESET_ALL}")
 
+def calcular_radar_pro(df: pd.DataFrame, dados_halls: dict):
+    """
+    Motor de Cálculo de Radar v1.0: 
+    Retorna os dados estruturados de atraso e média para todas as elites.
+    """
+    LIMIARES = {"17": 12, "18": 13, "19": 13, "20": 14}
+    lista_sorteios = _extrair_lista_sorteios(df)
+    historico = df.tail(300).copy()
+    sorteios_hist = _extrair_lista_sorteios(historico)
+    
+def calcular_stats_completos_reis(df: pd.DataFrame, dados_halls: dict):
+    """
+    Super Motor de Estatísticas v1.0: 
+    Compila Radar, Ciclos e Histórico de Intervalos em um único objeto.
+    """
+    LIMIARES = {"17": 12, "18": 13, "19": 13, "20": 14}
+    lista_sorteios = _extrair_lista_sorteios(df)
+    concursos = sorted(df['concurso'].tolist())
+    num_cols = [f"n{i:02d}" for i in range(1, 16)]
+    sorteios_full = [set(int(row[c]) for c in num_cols) for _, row in df.iterrows()]
+    
+    resultados = {}
+    for e in ["17", "18", "19", "20"]:
+        if e not in dados_halls: continue
+        resultados[e] = {}
+        limiar = LIMIARES[e]
+        
+        for k in ["15", "14", "13", "12", "11"]:
+            if k not in dados_halls[e]: continue
+            target = set(dados_halls[e][k]["dezenas"])
+            
+            # 1. RADAR (Atraso e Média)
+            hits = [len(target & s) >= limiar for s in sorteios_full]
+            last_hit_idx = -1
+            atraso = 0
+            intervalos_historicos = []
+            
+            for idx, hit in enumerate(hits):
+                if hit:
+                    if last_hit_idx != -1:
+                        intervalos_historicos.append(idx - last_hit_idx)
+                    last_hit_idx = idx
+            
+            atraso = len(hits) - 1 - last_hit_idx if last_hit_idx != -1 else len(hits)
+            media = sum(intervalos_historicos[-50:]) / len(intervalos_historicos[-50:]) if intervalos_historicos else 8.5
+            
+            # 2. CICLO
+            vistos_ciclo = set()
+            inicio_ciclo = concursos[0]
+            for i in range(len(sorteios_full)-1, -1, -1):
+                vistos_ciclo.update(sorteios_full[i] & target)
+                if vistos_ciclo == target:
+                    inicio_ciclo = concursos[i+1] if i < len(concursos)-1 else concursos[-1]
+                    break
+            
+            vistos_agora = set()
+            contagem_ciclo = 0
+            for i in range(len(concursos)):
+                if concursos[i] >= inicio_ciclo:
+                    vistos_agora.update(sorteios_full[i] & target)
+                    contagem_ciclo += 1
+            faltam = sorted(list(target - vistos_agora))
+
+            resultados[e][k] = {
+                "titulo": dados_halls[e][k]["titulo"],
+                "atraso": atraso,
+                "media": round(media, 1),
+                "intervalos": intervalos_historicos[-10:],
+                "ciclo": {
+                    "inicio": inicio_ciclo,
+                    "concursos": contagem_ciclo,
+                    "faltam": faltam,
+                    "n_faltam": len(faltam)
+                }
+            }
+    return resultados
+
+def calcular_mapa_calor_pontos_pro(df: pd.DataFrame, dados_halls: dict):
+    """
+    Motor de Calor por Pontos v1.0: 
+    Calcula quantos pontos cada REI (15,14,13,12,11) faria nos últimos 30 sorteios.
+    """
+    historico = df.tail(30).copy().sort_values('concurso', ascending=False)
+    num_cols = [f"n{i:02d}" for i in range(1, 16)]
+    
+    # Extrair os Reis (usando a Elite 18 como padrão para o mapa de comparação, 
+    # ou podemos fazer para qualquer uma. O usuário sugeriu REI 15..11)
+    # Vamos pegar da Elite 18 que é a mais balanceada.
+    elite_ref = "18"
+    if elite_ref not in dados_halls: 
+        # Fallback para a primeira disponível
+        elite_ref = list(dados_halls.keys())[0] if dados_halls else None
+        
+    if not elite_ref: return []
+    
+    reis_targets = {}
+    for k in ["15", "14", "13", "12", "11"]:
+        if k in dados_halls[elite_ref]:
+            reis_targets[k] = set(dados_halls[elite_ref][k]["dezenas"])
+            
+    resultados = []
+    for _, row in historico.iterrows():
+        sorteio = set(int(row[c]) for c in num_cols)
+        conc = int(row['concurso'])
+        
+        linha = {"concurso": conc, "pontos": {}}
+        for k, target in reis_targets.items():
+            acertos = len(target & sorteio)
+            linha["pontos"][k] = acertos
+            
+        resultados.append(linha)
+        
+    return resultados
+
+def exibir_mapa_calor_pontos_reis(df: pd.DataFrame, dados_halls: dict):
+    """
+    Opção 86: Exibe o Mapa de Calor de Pontos no Terminal.
+    """
+    dados = calcular_mapa_calor_pontos_pro(df, dados_halls)
+    if not dados:
+        print(f"{Fore.RED}Erro: Dados dos Reis não encontrados.{Style.RESET_ALL}")
+        return
+
+    print(f"\n{Fore.CYAN}╔{'═'*62}╗")
+    print(f"║ 📊 MAPA DE CALOR: ÚLTIMOS 30 SORTEIOS (ELITE DOS REIS)     ║")
+    print(f"╚{'═'*62}╝{Style.RESET_ALL}")
+    
+    print(f"  CONC.  │ REI 15 │ REI 14 │ REI 13 │ REI 12 │ REI 11 │")
+    print(f"  {'─'*7}┼─{'─'*6}─┼─{'─'*6}─┼─{'─'*6}─┼─{'─'*6}─┼─{'─'*6}─┤")
+
+    for d in dados:
+        conc = d["concurso"]
+        pts = d["pontos"]
+        
+        # Marcar se algum pontuou 11+
+        prefix = f"{Fore.GREEN}X{Style.RESET_ALL} " if any(v >= 11 for v in pts.values()) else "  "
+        
+        linha = f"{prefix}{conc:<6} │"
+        for k in ["15", "14", "13", "12", "11"]:
+            val = pts.get(k, 0)
+            cor = Fore.GREEN if val >= 11 else Fore.WHITE
+            if val >= 13: cor = Fore.YELLOW + Style.BRIGHT
+            linha += f" {cor}{val:02d} pts{Style.RESET_ALL} │"
+            
+        print(linha)
+
+    print(f"  {'─'*63}")
+    print(f"  {Fore.YELLOW}Legenda:{Style.RESET_ALL} {Fore.GREEN}PONTUOU (11+ pts){Style.RESET_ALL} │ {Fore.WHITE}Sem Ponto (<11 pts){Style.RESET_ALL}")
 def exibir_radar_unificado_reis(df: pd.DataFrame, dados_halls: dict):
     """
     Radar Unificado v3.2: Compara o atraso (jejum) atual de todos os Reis.
-    Ajustado para alinhamento milimétrico com emojis.
     """
-    LIMIARES = {"17": 12, "18": 13, "19": 13, "20": 14}
     CORES = {
         "17": Fore.CYAN,
         "18": Fore.GREEN,
@@ -1082,14 +1249,13 @@ def exibir_radar_unificado_reis(df: pd.DataFrame, dados_halls: dict):
         "20": Fore.LIGHTRED_EX,
     }
 
-    lista_sorteios = _extrair_lista_sorteios(df)
+    radar_data = calcular_radar_pro(df, dados_halls)
     width = 138
     print(f"\n{Fore.LIGHTCYAN_EX}╔{'═'*width}╗")
     titulo = f"📡 RADAR UNIFICADO DE JEJUM — STATUS DE OPORTUNIDADE ATUAL (17-20 DZ)"
     print(f"║ {titulo.center(width - 2)} ║")
     print(f"╚{'═'*width}╝{Style.RESET_ALL}")
 
-    # Cabeçalhos com larguras fixas: REI (10) + [31] * 4
     h1 = f"  {' ':^9} │"
     h2 = f"  {' REI':<9} │"
     
@@ -1102,34 +1268,15 @@ def exibir_radar_unificado_reis(df: pd.DataFrame, dados_halls: dict):
     print(h2)
     print("  " + "─" * (len(h2) - 3))
 
-    # Nomes e Status com larguras controladas
     for k in ["15", "14", "13", "12", "11"]:
         linha = f"  {Fore.WHITE} R{k:<7}{Style.RESET_ALL} │"
         
         for e in ["17", "18", "19", "20"]:
-            if e in dados_halls and k in dados_halls[e]:
-                dezenas = set(dados_halls[e][k]["dezenas"])
-                limiar = LIMIARES[e]
+            if e in radar_data and k in radar_data[e]:
+                info = radar_data[e][k]
+                atraso = info["atraso"]
+                media = info["media"]
                 
-                # Cálculo de atraso
-                atraso = 0
-                for i in range(len(lista_sorteios)-1, -1, -1):
-                    if len(dezenas & lista_sorteios[i]) >= limiar: break
-                    atraso += 1
-                
-                # Média (Janela focada)
-                historico = df.tail(300).copy()
-                sorteios_hist = _extrair_lista_sorteios(historico)
-                hits = [len(dezenas & s) >= limiar for s in sorteios_hist]
-                last_h = -1
-                ints = []
-                for idx, h in enumerate(hits):
-                    if h:
-                        if last_h != -1: ints.append(idx - last_h)
-                        last_h = idx
-                media = sum(ints) / len(ints) if ints else 8.0
-                
-                # Status com compensação manual de largura (Emoji = 2 chars visuais)
                 if atraso == 0:
                     status_fmt = f"{Fore.GREEN}🔥 QUENTE!{Style.RESET_ALL}  "
                 elif atraso > media * 1.5:
@@ -1139,10 +1286,6 @@ def exibir_radar_unificado_reis(df: pd.DataFrame, dados_halls: dict):
                 else:
                     status_fmt = f"{Fore.WHITE}⏳ JEJUM    {Style.RESET_ALL}"
                 
-                # Parte dos dados: 
-                # "  00 s   00.0   " = 16 chars
-                # status_fmt = 12 chars visuais (ajustado acima)
-                # Total = 28 + 3 espaços = 31
                 col_data = f"   {atraso:02d} s   {media:04.1f}   {status_fmt} "
                 linha += f"{col_data}│"
             else:
@@ -1249,3 +1392,7 @@ def exibir_resumo_ciclos_unificado(df: pd.DataFrame, dados_halls: dict):
     print(f"\n  {Fore.YELLOW}Legenda: CONC = Sorteios passados no ciclo atual | FALTA = Dezenas que ainda não saíram no ciclo.{Style.RESET_ALL}")
     print(f"  {Fore.MAGENTA}💡 ESTRATÉGIA: Foque nos Reis que faltam entre {Fore.RED}01 e 03 dezenas{Style.RESET_ALL}. "
           f"Eles são os alvos maduros para a Caçada de Ciclo.{Style.RESET_ALL}")
+
+def exibir_ciclo_unificado(df, dados_halls):
+    """Alias para compatibilidade com main.py"""
+    return exibir_resumo_ciclos_unificado(df, dados_halls)

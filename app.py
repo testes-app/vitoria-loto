@@ -108,15 +108,57 @@ def api_saldo():
         logger.error(f"Erro ao calcular saldo: {e}")
         return jsonify({})
 
+@app.route("/api/elite_master")
+def api_elite_master():
+    try:
+        from src.data.database import carregar_sorteios
+        from src.analysis.stats import calcular_stats_completos_reis
+        
+        df = carregar_sorteios()
+        halls = {
+            "17": json.loads((BASE_DIR/"data"/"hall_of_fame.json").read_text(encoding="utf-8")) if (BASE_DIR/"data"/"hall_of_fame.json").exists() else {},
+            "18": json.loads((BASE_DIR/"data"/"hall_of_fame_18.json").read_text(encoding="utf-8")) if (BASE_DIR/"data"/"hall_of_fame_18.json").exists() else {},
+            "19": json.loads((BASE_DIR/"data"/"hall_of_fame_19.json").read_text(encoding="utf-8")) if (BASE_DIR/"data"/"hall_of_fame_19.json").exists() else {},
+            "20": json.loads((BASE_DIR/"data"/"hall_of_fame_20.json").read_text(encoding="utf-8")) if (BASE_DIR/"data"/"hall_of_fame_20.json").exists() else {}
+        }
+        
+        return jsonify(calcular_stats_completos_reis(df, halls))
+    except Exception as e:
+        logger.error(f"Erro na API Elite Master: {e}")
+        return jsonify({"error": str(e)}), 500
+
+@app.route("/api/mapa_calor_pontos")
+def api_mapa_calor_pontos():
+    try:
+        from src.data.database import carregar_sorteios
+        from src.analysis.stats import calcular_mapa_calor_pontos_pro
+        
+        df = carregar_sorteios()
+        halls = {
+            "17": json.loads((BASE_DIR/"data"/"hall_of_fame.json").read_text(encoding="utf-8")) if (BASE_DIR/"data"/"hall_of_fame.json").exists() else {},
+            "18": json.loads((BASE_DIR/"data"/"hall_of_fame_18.json").read_text(encoding="utf-8")) if (BASE_DIR/"data"/"hall_of_fame_18.json").exists() else {},
+            "19": json.loads((BASE_DIR/"data"/"hall_of_fame_19.json").read_text(encoding="utf-8")) if (BASE_DIR/"data"/"hall_of_fame_19.json").exists() else {},
+            "20": json.loads((BASE_DIR/"data"/"hall_of_fame_20.json").read_text(encoding="utf-8")) if (BASE_DIR/"data"/"hall_of_fame_20.json").exists() else {}
+        }
+        
+        return jsonify(calcular_mapa_calor_pontos_pro(df, halls))
+    except Exception as e:
+        logger.error(f"Erro na API Mapa Calor Pontos: {e}")
+        return jsonify({"error": str(e)}), 500
+
 @app.route("/api/hall_of_fame")
 def api_hall_of_fame():
     try:
         path17 = BASE_DIR / "data" / "hall_of_fame.json"
         path18 = BASE_DIR / "data" / "hall_of_fame_18.json"
+        path19 = BASE_DIR / "data" / "hall_of_fame_19.json"
+        path20 = BASE_DIR / "data" / "hall_of_fame_20.json"
         
         result = {
             "r17": json.loads(path17.read_text(encoding="utf-8")) if path17.exists() else {},
-            "r18": json.loads(path18.read_text(encoding="utf-8")) if path18.exists() else {}
+            "r18": json.loads(path18.read_text(encoding="utf-8")) if path18.exists() else {},
+            "r19": json.loads(path19.read_text(encoding="utf-8")) if path19.exists() else {},
+            "r20": json.loads(path20.read_text(encoding="utf-8")) if path20.exists() else {}
         }
         return jsonify(result)
     except Exception as e:

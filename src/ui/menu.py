@@ -107,6 +107,10 @@ def menu_principal():
  44. 📈 Sequências consecutivas (diagrama)
  45. 🔄 Repetições do sorteio anterior (diagrama)
 
+{Fore.CYAN}  ── CONFIGURAÇÕES E UTILITÁRIOS ──────────────────{Style.RESET_ALL}
+ 80. 🗺️ Mapa de Calor Unificado (Todos os Reis)
+ 86. 🔥 Mapa de Calor por Pontos (Últimos 30)
+
 {Fore.RED}  0.  🚪 Sair{Style.RESET_ALL}
 """)
     return input(f"{Fore.GREEN}👉 Escolha uma opção: {Style.RESET_ALL}").strip()

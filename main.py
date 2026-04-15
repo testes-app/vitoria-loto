@@ -4,7 +4,8 @@ Ponto de entrada principal.
 """
 import sys
 import json
-from colorama import Fore, Style, init
+from pathlib import Path
+from colorama import Fore, Back, Style, init
 
 init(autoreset=True)
 
@@ -146,7 +147,7 @@ def main():
             distribuicao_quadrante(df)
 
         elif opcao == "46":
-            from pathlib import Path
+
             base_dir = Path(__file__).parent
             path = base_dir / "data" / "hall_of_fame.json"
             if not path.exists():
@@ -158,7 +159,7 @@ def main():
             pausar()
 
         elif opcao == "47":
-            from pathlib import Path
+
             base_dir = Path(__file__).parent
             path = base_dir / "data" / "hall_of_fame.json"
             if not path.exists():
@@ -184,7 +185,7 @@ def main():
             pausar()
 
         elif opcao == "48":
-            from pathlib import Path
+
             base_dir = Path(__file__).parent
             path = base_dir / "data" / "hall_of_fame.json"
             if not path.exists():
@@ -197,7 +198,7 @@ def main():
             pausar()
 
         elif opcao == "49":
-            from pathlib import Path
+
             base_dir = Path(__file__).parent
             path = base_dir / "data" / "hall_of_fame.json"
             if not path.exists():
@@ -210,7 +211,7 @@ def main():
             pausar()
 
         elif opcao == "50":
-            from pathlib import Path
+
             base_dir = Path(__file__).parent
             path = base_dir / "data" / "hall_of_fame_18.json"
             if not path.exists():
@@ -222,7 +223,7 @@ def main():
             pausar()
 
         elif opcao == "51":
-            from pathlib import Path
+
             base_dir = Path(__file__).parent
             path = base_dir / "data" / "hall_of_fame_18.json"
             if not path.exists():
@@ -248,7 +249,7 @@ def main():
             pausar()
 
         elif opcao == "52":
-            from pathlib import Path
+
             base_dir = Path(__file__).parent
             path = base_dir / "data" / "hall_of_fame_18.json"
             if not path.exists():
@@ -261,7 +262,7 @@ def main():
             pausar()
 
         elif opcao == "53":
-            from pathlib import Path
+
             base_dir = Path(__file__).parent
             path = base_dir / "data" / "hall_of_fame_18.json"
             if not path.exists():
@@ -274,7 +275,7 @@ def main():
             pausar()
 
         elif opcao == "54":
-            from pathlib import Path
+
             base_dir = Path(__file__).parent
             path = base_dir / "data" / "hall_of_fame_18.json"
             if not path.exists():
@@ -288,7 +289,7 @@ def main():
             pausar()
 
         elif opcao == "56":
-            from pathlib import Path
+
             base_dir = Path(__file__).parent
             path = base_dir / "data" / "hall_of_fame.json"
             if not path.exists():
@@ -302,7 +303,7 @@ def main():
             pausar()
 
         elif opcao == "55":
-            from pathlib import Path
+
             base_dir = Path(__file__).parent
             path = base_dir / "data" / "hall_of_fame_18.json"
             if not path.exists():
@@ -322,7 +323,7 @@ def main():
             pausar()
 
         elif opcao == "57":
-            from pathlib import Path
+
             base_dir = Path(__file__).parent
             path = base_dir / "data" / "hall_of_fame.json"
             if not path.exists():
@@ -344,7 +345,7 @@ def main():
             pausar()
 
         elif opcao == "61":
-            from pathlib import Path
+
             base_dir = Path(__file__).parent
             path = base_dir / "data" / "hall_of_fame_19.json"
             if path.exists():
@@ -355,7 +356,7 @@ def main():
             pausar()
 
         elif opcao == "62":
-            from pathlib import Path
+
             base_dir = Path(__file__).parent
             path = base_dir / "data" / "hall_of_fame_19.json"
             if path.exists():
@@ -378,7 +379,7 @@ def main():
             pausar()
 
         elif opcao == "63":
-            from pathlib import Path
+
             base_dir = Path(__file__).parent
             path = base_dir / "data" / "hall_of_fame_19.json"
             if path.exists():
@@ -390,7 +391,7 @@ def main():
             pausar()
 
         elif opcao == "64":
-            from pathlib import Path
+
             base_dir = Path(__file__).parent
             path = base_dir / "data" / "hall_of_fame_19.json"
             if path.exists():
@@ -402,7 +403,7 @@ def main():
             pausar()
 
         elif opcao == "65":
-            from pathlib import Path
+
             base_dir = Path(__file__).parent
             path = base_dir / "data" / "hall_of_fame_19.json"
             if not path.exists():
@@ -423,7 +424,7 @@ def main():
             pausar()
 
         elif opcao == "66":
-            from pathlib import Path
+
             bp = Path(__file__).parent
             p = bp / "data" / "hall_of_fame_19.json"
             if p.exists():
@@ -434,7 +435,7 @@ def main():
             pausar()
 
         elif opcao == "71":
-            from pathlib import Path
+
             base_dir = Path(__file__).parent
             path = base_dir / "data" / "hall_of_fame_20.json"
             if path.exists():
@@ -445,7 +446,7 @@ def main():
             pausar()
 
         elif opcao == "72":
-            from pathlib import Path
+
             base_dir = Path(__file__).parent
             path = base_dir / "data" / "hall_of_fame_20.json"
             if path.exists():
@@ -468,7 +469,6 @@ def main():
             pausar()
 
         elif opcao == "73":
-            from pathlib import Path
             base_dir = Path(__file__).parent
             path = base_dir / "data" / "hall_of_fame_20.json"
             if path.exists():
@@ -480,7 +480,6 @@ def main():
             pausar()
 
         elif opcao == "74":
-            from pathlib import Path
             base_dir = Path(__file__).parent
             path = base_dir / "data" / "hall_of_fame_20.json"
             if path.exists():
@@ -492,7 +491,6 @@ def main():
             pausar()
 
         elif opcao == "75":
-            from pathlib import Path
             base_dir = Path(__file__).parent
             path = base_dir / "data" / "hall_of_fame_20.json"
             if not path.exists():
@@ -513,7 +511,6 @@ def main():
             pausar()
 
         elif opcao == "76":
-            from pathlib import Path
             bp = Path(__file__).parent
             p = bp / "data" / "hall_of_fame_20.json"
             if p.exists():
@@ -521,6 +518,26 @@ def main():
                 exibir_resumo_ciclos_completo(df, d, label="20 DZ")
             else:
                 print(f"  {Fore.RED}❌ Arquivo de 20 DZ não encontrado.{Style.RESET_ALL}")
+            pausar()
+
+        elif opcao == "80":
+            from src.analysis.stats import exibir_mapa_calor_todos_reis
+            halls = {}
+            for elite, arq in {"17": "hall_of_fame.json", "18": "hall_of_fame_18.json", "19": "hall_of_fame_19.json", "20": "hall_of_fame_20.json"}.items():
+                p = Path(__file__).parent / "data" / arq
+                if p.exists(): halls[elite] = json.loads(p.read_text(encoding="utf-8"))
+            if halls: exibir_mapa_calor_todos_reis(df, halls)
+            else: print(f"  {Fore.RED}❌ Nenhum dado de Hall of Fame encontrado.{Style.RESET_ALL}")
+            pausar()
+
+        elif opcao == "86":
+            from src.analysis.stats import exibir_mapa_calor_pontos_reis
+            halls = {}
+            for elite, arq in {"17": "hall_of_fame.json", "18": "hall_of_fame_18.json", "19": "hall_of_fame_19.json", "20": "hall_of_fame_20.json"}.items():
+                p = Path(__file__).parent / "data" / arq
+                if p.exists(): halls[elite] = json.loads(p.read_text(encoding="utf-8"))
+            if halls: exibir_mapa_calor_pontos_reis(df, halls)
+            else: print(f"  {Fore.RED}❌ Nenhum dado de Hall of Fame encontrado.{Style.RESET_ALL}")
             pausar()
 
         elif opcao == "0":
@@ -534,35 +551,13 @@ def main():
                   else f"  {Fore.YELLOW}Dados já atualizados.{Style.RESET_ALL}")
 
         elif opcao == "60":
-            from pathlib import Path
+
             rodar_auditoria_suprema(df, Path(__file__).parent)
             pausar()
 
-        elif opcao == "80":
-            from pathlib import Path
-            base_dir = Path(__file__).parent
-            dados_halls = {}
-            mapa_arquivos = {
-                "17": "hall_of_fame.json",
-                "18": "hall_of_fame_18.json",
-                "19": "hall_of_fame_19.json",
-                "20": "hall_of_fame_20.json"
-            }
-            for elite, arq in mapa_arquivos.items():
-                p = base_dir / "data" / arq
-                if p.exists():
-                    with open(p, "r", encoding="utf-8") as f:
-                        dados_halls[elite] = json.load(f)
-            
-            if not dados_halls:
-                print(f"  {Fore.RED}❌ Nenhum arquivo de Hall da Fama encontrado!{Style.RESET_ALL}")
-            else:
-                n = pedir_numero("  Exibir mapa de quantos sorteios? (5-100): ", 5, 100)
-                exibir_mapa_calor_todos_reis(df, dados_halls, ultimos_n=n)
-            pausar()
+
 
         elif opcao == "81":
-            from pathlib import Path
             base_dir = Path(__file__).parent
             dados_halls = {}
             mapa_arquivos = {
@@ -584,7 +579,6 @@ def main():
             pausar()
 
         elif opcao == "82":
-            from pathlib import Path
             base_dir = Path(__file__).parent
             dados_halls = {}
             mapa_arquivos = {
