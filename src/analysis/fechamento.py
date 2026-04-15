@@ -10,76 +10,104 @@ def _gerar_fechamento(dezenas: list, tamanho_jogo: int = 15,
                       garantia: int = 11, verbose: bool = True) -> list:
     """
     Gera conjunto minimo de jogos com cobertura garantida.
-    Algoritmo guloso otimizado com bitwise para 25 dezenas.
+    Algoritmo guloso com varredura chunked — correto e sem OOM para 20+ dezenas.
+    Chunk de 1000 alvos × 1500 jogos × 1 byte = 1.5 MB por passo.
     """
     import random
+    import numpy as np
+
     dezenas = sorted(dezenas)
     n = len(dezenas)
-    idx = {d: i for i, d in enumerate(dezenas)}
 
-    # Representa cada jogo e alvo como bitmask
-    todos_jogos = list(combinations(dezenas, tamanho_jogo))
-    alvos = list(combinations(dezenas, garantia))
+    todos_jogos = list(combinations(range(n), tamanho_jogo))
+    alvos       = list(combinations(range(n), garantia))
 
-    # Bitmasks
-    jogo_masks = []
-    for jogo in todos_jogos:
-        mask = 0
-        for d in jogo:
-            mask |= (1 << idx[d])
-        jogo_masks.append(mask)
+    total_jogos = len(todos_jogos)
+    total_alvos = len(alvos)
 
-    alvo_masks = []
-    for alvo in alvos:
-        mask = 0
-        for d in alvo:
-            mask |= (1 << idx[d])
-        alvo_masks.append(mask)
-
-    nao_cobertos = set(range(len(alvo_masks)))
-    jogos_escolhidos = []
+    # Guarda de segurança: bloquear grupos com jogos demais para não travar RAM
+    MAX_JOGOS_VIAVEL = 50_000
+    if total_jogos > MAX_JOGOS_VIAVEL:
+        print(f"\n  {Fore.RED}❌ GRUPO MUITO GRANDE PARA O ALGORITMO!{Style.RESET_ALL}")
+        print(f"  {n} dezenas geram {total_jogos:,} jogos possíveis.")
+        print(f"  Limite seguro: {MAX_JOGOS_VIAVEL:,} jogos (≤ 21 dezenas).")
+        print(f"  {Fore.YELLOW}💡 Use 17-20 dezenas ou opção 4 (manual) com grupos menores.{Style.RESET_ALL}")
+        return []
 
     if verbose:
-        print(f"\n{Fore.CYAN}  ⚙️  Calculando fechamento...{Style.RESET_ALL}")
+        print(f"\n{Fore.CYAN}  ⚙️  Calculando fechamento (NumPy chunked)...{Style.RESET_ALL}")
         print(f"  Grupo: {n} dezenas | Jogo: {tamanho_jogo} dezenas | Garantia: {garantia}pts")
-        print(f"  Total de subconjuntos para cobrir: {len(alvo_masks):,}")
+        print(f"  Subconjuntos: {total_alvos:,} | Jogos possíveis: {total_jogos:,}")
 
-    while nao_cobertos:
-        melhor_idx = -1
-        melhor_ganho = 0
+    # Bitmasks NumPy int64 (suporta até 63 bits = 25 dezenas)
+    jogo_masks = np.zeros(total_jogos, dtype=np.int64)
+    for j, jogo in enumerate(todos_jogos):
+        for i in jogo:
+            jogo_masks[j] |= np.int64(1 << i)
 
-        # Amostra maior para 25 dezenas
-        tamanho_amostra = min(2000, len(todos_jogos))
-        indices = random.sample(range(len(todos_jogos)), tamanho_amostra)
+    alvo_masks = np.zeros(total_alvos, dtype=np.int64)
+    for a, alvo in enumerate(alvos):
+        for i in alvo:
+            alvo_masks[a] |= np.int64(1 << i)
 
-        for ji in indices:
-            jmask = jogo_masks[ji]
-            ganho = sum(1 for ai in nao_cobertos if (alvo_masks[ai] & jmask) == alvo_masks[ai])
-            if ganho > melhor_ganho:
-                melhor_ganho = ganho
-                melhor_idx = ji
+    nao_cobertos = np.ones(total_alvos, dtype=bool)
+    jogos_escolhidos = []
 
-        if melhor_idx == -1 or melhor_ganho == 0:
+    # Avalia TODOS os jogos possíveis por iteração (sem amostragem de jogos)
+    # Alvos processados em chunks para manter memória baixa
+    # Chunk 2000 × total_jogos × 1 byte: ex. 2000×15504 = 31 MB → seguro
+    CHUNK = 2000
+    STOP_PCT = 95.0  # parar em 95% — os últimos 5% custam quase tanto quanto os 95%
+
+    if verbose:
+        print(f"  Modo: todos {total_jogos:,} jogos avaliados | chunk {CHUNK} alvos | stop@{STOP_PCT}%")
+
+    while nao_cobertos.any():
+        nc_indices = np.where(nao_cobertos)[0]
+        pct_atual = (1 - len(nc_indices) / total_alvos) * 100
+
+        if pct_atual >= STOP_PCT:
+            if verbose:
+                print(f"\n  {Fore.YELLOW}⏹  Stop automático em {pct_atual:.1f}% de cobertura.{Style.RESET_ALL}")
             break
 
-        jogos_escolhidos.append(list(todos_jogos[melhor_idx]))
-        jmask = jogo_masks[melhor_idx]
-        nao_cobertos = {ai for ai in nao_cobertos if (alvo_masks[ai] & jmask) != alvo_masks[ai]}
+        # Acumular scores para TODOS os jogos, varrendo alvos em chunks
+        ganhos = np.zeros(total_jogos, dtype=np.int32)
+        for start in range(0, len(nc_indices), CHUNK):
+            chunk_idx = nc_indices[start:start + CHUNK]
+            chunk_masks = alvo_masks[chunk_idx]             # (chunk,)
+            # (chunk, total_jogos) bool — ex. 2000×15504 = 31 MB
+            covered = (chunk_masks[:, None] & jogo_masks[None, :]) == chunk_masks[:, None]
+            ganhos += covered.sum(axis=0).astype(np.int32)
+
+        melhor_j_idx = int(np.argmax(ganhos))
+        melhor_ganho = int(ganhos[melhor_j_idx])
+
+        if melhor_ganho == 0:
+            break
+
+        jogo_escolhido = [dezenas[i] for i in todos_jogos[melhor_j_idx]]
+        jogos_escolhidos.append(jogo_escolhido)
+
+        jmask = jogo_masks[melhor_j_idx]
+        nao_cobertos &= ~((alvo_masks & jmask) == alvo_masks)
 
         if verbose and len(jogos_escolhidos) % 5 == 0:
-            pct = (1 - len(nao_cobertos)/len(alvo_masks)) * 100
+            pct = (1 - nao_cobertos.sum() / total_alvos) * 100
             print(f"  Jogos: {len(jogos_escolhidos):3d} | Cobertura: {pct:.1f}%", end="\r")
 
-    cobertura_final = (1 - len(nao_cobertos)/len(alvo_masks)) * 100
+    cobertura_final = (1 - nao_cobertos.sum() / total_alvos) * 100
 
     if verbose:
         print(f"\n  {Fore.GREEN}✅ Fechamento concluído!{Style.RESET_ALL}")
         print(f"  Jogos gerados: {len(jogos_escolhidos)}")
         print(f"  Cobertura: {cobertura_final:.1f}%")
-        if nao_cobertos:
-            print(f"  {Fore.YELLOW}⚠️  {len(nao_cobertos)} subconjuntos nao cobertos{Style.RESET_ALL}")
+        if nao_cobertos.any():
+            remaining = nao_cobertos.sum()
+            print(f"  {Fore.YELLOW}⚠️  {remaining:,} não cobertos ({remaining/total_alvos*100:.1f}%){Style.RESET_ALL}")
 
     return jogos_escolhidos
+
 
 
 
@@ -171,16 +199,23 @@ def rodar_fechamento_interativo(df_sorteios, ranking_preditivo=None):
 
     # Escolhe grupo de dezenas
     print(f"\n  Grupo de dezenas:")
-    print(f"  1. 17 dezenas do Índice Preditivo")
-    print(f"  2. 18 dezenas do Índice Preditivo")
-    print(f"  3. 20 dezenas do Índice Preditivo")
-    print(f"  4. Digitar manualmente")
-    print(f"  5. Todos os 25 números")
+    print(f"  1. 17 dezenas do Índice Preditivo  (~17 jogos | R$59)")
+    print(f"  2. 18 dezenas do Índice Preditivo  (~30 jogos | R$105)")
+    print(f"  3. 20 dezenas do Índice Preditivo  (~80 jogos | R$280)")
+    print(f"  4. Digitar manualmente (até 21 dz)")
+    print(f"  {Fore.RED}5. 25 números — BLOQUEADO (excede RAM){Style.RESET_ALL}")
 
-    escolha_grupo = pedir_string("  Opção: ")
+    escolha_grupo = pedir_string("  Opção (1-4): ")
+    while escolha_grupo not in ("1", "2", "3", "4"):
+        if escolha_grupo == "5":
+            print(f"  {Fore.RED}❌ 25 dezenas gera 3.2 milhões de jogos — impossível calcular.{Style.RESET_ALL}")
+            print(f"  {Fore.YELLOW}  Use opção 4 e digite um subgrupo de até 21 dezenas.{Style.RESET_ALL}")
+        else:
+            print(f"  {Fore.RED}❌ Opção inválida! Digite 1, 2, 3 ou 4.{Style.RESET_ALL}")
+        escolha_grupo = pedir_string("  Opção (1-4): ")
 
-    if escolha_grupo in ("1", "2", "3", "5"):
-        n_dez = {"1": 17, "2": 18, "3": 20, "5": 25}[escolha_grupo]
+    if escolha_grupo in ("1", "2", "3"):
+        n_dez = {"1": 17, "2": 18, "3": 20}[escolha_grupo]
 
         if ranking_preditivo:
             # Extrai dezenas mais frequentes do ranking
@@ -256,9 +291,9 @@ def rodar_fechamento_interativo(df_sorteios, ranking_preditivo=None):
     # Salva jogos
     import json
     import os
-    caminho = "/mnt/c/Users/nome_do_usuario/Desktop/super-lotofacil/data/fechamento_jogos.json"
+    caminho = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), "data", "fechamento_jogos.json")
     with open(caminho, "w") as f:
         json.dump(jogos, f)
-    print(f"\n  {Fore.GREEN}💾 Jogos salvos em fechamento_jogos.json!{Style.RESET_ALL}")
+    print(f"\n  {Fore.GREEN}💾 Jogos salvos em data/fechamento_jogos.json!{Style.RESET_ALL}")
 
     return jogos

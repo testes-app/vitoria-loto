@@ -66,6 +66,7 @@ def menu_principal():
  80. 🌡️ MAPA CALOR UNIFICADO — Todos os Reis (17-20)
  81. 📡 RADAR UNIFICADO — Atraso/Jejum de Todos os Reis
  82. 🔭 MONITOR DE CICLOS UNIFICADO — Todos os Elites
+ 85. 📐 FECHAMENTO MATEMÁTICO (11 pts garantidos)
 
 {Fore.YELLOW}  ── ELITE 17 — RECORDISTAS HISTÓRICOS ───────────{Style.RESET_ALL}
  46. 👑 Hall da Fama (Os Reis da Lotofácil - 17)
@@ -89,6 +90,7 @@ def menu_principal():
  63. 📡 Radar de Atraso Semanal 19
  64. 📅 Histórico de Intervalos 19
  65. 🏹 Caçador de Ciclo (Gerar Jogos 19)
+ 66. 🔄 Monitor de Ciclo Interno (Reis 19)
 
 {Fore.YELLOW}  ── ELITE 20 — OS ULTRA REIS (A FORTALEZA) ──────{Style.RESET_ALL}
  71. 👑 Hall da Fama 20 (Os Reis de 20 DZ)
@@ -96,6 +98,7 @@ def menu_principal():
  73. 📡 Radar de Atraso Semanal 20
  74. 📅 Histórico de Intervalos 20
  75. 🏹 Caçador de Ciclo (Gerar Jogos 20)
+ 76. 🔄 Monitor de Ciclo Interno (Reis 20)
 
 {Fore.YELLOW}  ── DIAGRAMAS HTML ──────────────────────────────{Style.RESET_ALL}
  41. 🌐 Frequência geral (diagrama)

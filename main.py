@@ -39,20 +39,47 @@ from src.ui.menu import (
     limpar, menu_principal, pausar, pedir_numero, pedir_string, cabecalho
 )
 
-def exibir_hall_fama(dados, label):
-    """Exibe o visual elegante do Hall da Fama para qualquer elite."""
+def exibir_hall_fama(dados, label, df=None):
+    """Exibe o visual elegante do Hall da Fama para qualquer elite com status de ciclo."""
+    from src.analysis.stats import _extrair_lista_sorteios
     print(f"\n{Fore.CYAN}╔{'═'*62}╗")
     print(f"║      🏆 HALL DA FAMA {label:7}: RECORDISTAS DE ELITE         ║")
-    print(f"╚{'═'*62}╝{Style.RESET_ALL}")
+    print(f"╚{'═'*62}╝{Style.RESET_ALL}\n")
+    
+    lista_sorteios = _extrair_lista_sorteios(df) if df is not None else []
     
     for k in ["15", "14", "13", "12", "11"]:
         if k in dados:
             r = dados[k]
-            dz = " ".join(f"{Fore.GREEN}{d:02d}{Style.RESET_ALL}" for d in r["dezenas"])
-            print(f"\n  {Fore.YELLOW}👑 {r['titulo']} {Style.RESET_ALL}")
-            print(f"  └─ {dz}")
+            dezenas_rei = set(r["dezenas"])
+            
+            # Calcular Ciclo se tiver DF
+            faltantes = set()
+            if lista_sorteios:
+                vistos = set()
+                for s in lista_sorteios:
+                    hits = s & dezenas_rei
+                    for h in hits:
+                        if vistos == dezenas_rei: vistos = set()
+                        vistos.add(h)
+                faltantes = dezenas_rei - vistos
+
+            # Formatar dezenas
+            dz_formatted = []
+            for d in sorted(list(dezenas_rei)):
+                if d in faltantes:
+                    dz_formatted.append(f"{Back.RED}{Fore.WHITE}{d:02d}{Style.RESET_ALL}")
+                else:
+                    dz_formatted.append(f"{Fore.GREEN}{d:02d}{Style.RESET_ALL}")
+            dz_str = " ".join(dz_formatted)
+
+            print(f"  {Fore.YELLOW}👑 {r['titulo']} {Style.RESET_ALL}")
+            print(f"  └─ {dz_str}")
             print(f"    {Fore.WHITE}📊 {r['stats']}{Style.RESET_ALL}")
-            print(f"    {Fore.CYAN}{'─'*53}")
+            print(f"    {Fore.CYAN}{'─'*53}{Style.RESET_ALL}")
+    
+    if lista_sorteios:
+        print(f"\n  {Back.RED}  {Style.RESET_ALL} = Pendente no Ciclo | {Fore.GREEN}00{Style.RESET_ALL} = Já saiu no Ciclo")
 
 
 def inicializar():
@@ -127,7 +154,7 @@ def main():
             else:
                 with open(path, "r", encoding="utf-8") as f:
                     dados = json.load(f)
-                exibir_hall_fama(dados, "17 DZ")
+                exibir_hall_fama(dados, "17 DZ", df=df)
             pausar()
 
         elif opcao == "47":
@@ -166,6 +193,7 @@ def main():
                 with open(path, "r", encoding="utf-8") as f:
                     dados = json.load(f)
                 radar_atraso_reis(df, dados)
+                exibir_mapa_calor_reis(df, dados, ultimos_n=30)
             pausar()
 
         elif opcao == "49":
@@ -190,7 +218,7 @@ def main():
             else:
                 with open(path, "r", encoding="utf-8") as f:
                     dados = json.load(f)
-                exibir_hall_fama(dados, "18 DZ")
+                exibir_hall_fama(dados, "18 DZ", df=df)
             pausar()
 
         elif opcao == "51":
@@ -229,6 +257,7 @@ def main():
                 with open(path, "r", encoding="utf-8") as f:
                     dados = json.load(f)
                 radar_atraso_reis(df, dados)
+                exibir_mapa_calor_reis(df, dados, ultimos_n=30)
             pausar()
 
         elif opcao == "53":
@@ -320,7 +349,7 @@ def main():
             path = base_dir / "data" / "hall_of_fame_19.json"
             if path.exists():
                 with open(path, "r", encoding="utf-8") as f: dados = json.load(f)
-                exibir_hall_fama(dados, "19 DZ")
+                exibir_hall_fama(dados, "19 DZ", df=df)
             else:
                 print(f"  {Fore.RED}❌ Arquivo de 19 DZ não encontrado.{Style.RESET_ALL}")
             pausar()
@@ -331,9 +360,19 @@ def main():
             path = base_dir / "data" / "hall_of_fame_19.json"
             if path.exists():
                 with open(path, "r", encoding="utf-8") as f: dados = json.load(f)
-                lista_reis = [r["dezenas"] for r in dados.values()]
+                lista_reis = []
+                titulos = []
+                for k in ["15", "14", "13", "12", "11"]:
+                    if k in dados:
+                        lista_reis.append(dados[k]["dezenas"])
+                        titulos.append(dados[k]["titulo"])
+
                 n = pedir_numero("  Conferir contra quantos sorteios? (10-100): ", 10, 100)
+                print(f"\n{Fore.CYAN}  📊 ANALISANDO OS {len(lista_reis)} REIS DE 19...{Style.RESET_ALL}")
                 conferir_jogos(df, lista_reis, ultimos_n=n)
+                if titulos:
+                    labels = ", ".join(f"J{i+1:02d}={t}" for i, t in enumerate(titulos))
+                    print(f"\n  {Fore.YELLOW}Nota: {labels}{Style.RESET_ALL}")
             else:
                 print(f"  {Fore.RED}❌ Arquivo de 19 DZ não encontrado.{Style.RESET_ALL}")
             pausar()
@@ -344,6 +383,7 @@ def main():
             path = base_dir / "data" / "hall_of_fame_19.json"
             if path.exists():
                 with open(path, "r", encoding="utf-8") as f: dados = json.load(f)
+                radar_atraso_reis(df, dados)
                 exibir_mapa_calor_reis(df, dados, ultimos_n=30)
             else:
                 print(f"  {Fore.RED}❌ Arquivo de 19 DZ não encontrado.{Style.RESET_ALL}")
@@ -356,6 +396,7 @@ def main():
             if path.exists():
                 with open(path, "r", encoding="utf-8") as f: dados = json.load(f)
                 listar_intervalos_reis(df, dados)
+                exibir_mapa_calor_reis(df, dados, ultimos_n=30)
             else:
                 print(f"  {Fore.RED}❌ Arquivo de 19 DZ não encontrado.{Style.RESET_ALL}")
             pausar()
@@ -381,13 +422,24 @@ def main():
                     print(f"  {Fore.RED}❌ Rei 15 (19 DZ) não encontrado no arquivo.{Style.RESET_ALL}")
             pausar()
 
+        elif opcao == "66":
+            from pathlib import Path
+            bp = Path(__file__).parent
+            p = bp / "data" / "hall_of_fame_19.json"
+            if p.exists():
+                with open(p, "r", encoding="utf-8") as f: d = json.load(f)
+                exibir_resumo_ciclos_completo(df, d, label="19 DZ")
+            else:
+                print(f"  {Fore.RED}❌ Arquivo de 19 DZ não encontrado.{Style.RESET_ALL}")
+            pausar()
+
         elif opcao == "71":
             from pathlib import Path
             base_dir = Path(__file__).parent
             path = base_dir / "data" / "hall_of_fame_20.json"
             if path.exists():
                 with open(path, "r", encoding="utf-8") as f: dados = json.load(f)
-                exibir_hall_fama(dados, "20 DZ")
+                exibir_hall_fama(dados, "20 DZ", df=df)
             else:
                 print(f"  {Fore.RED}❌ Arquivo de 20 DZ não encontrado.{Style.RESET_ALL}")
             pausar()
@@ -398,9 +450,19 @@ def main():
             path = base_dir / "data" / "hall_of_fame_20.json"
             if path.exists():
                 with open(path, "r", encoding="utf-8") as f: dados = json.load(f)
-                lista_reis = [r["dezenas"] for r in dados.values()]
+                lista_reis = []
+                titulos = []
+                for k in ["15", "14", "13", "12", "11"]:
+                    if k in dados:
+                        lista_reis.append(dados[k]["dezenas"])
+                        titulos.append(dados[k]["titulo"])
+
                 n = pedir_numero("  Conferir contra quantos sorteios? (10-100): ", 10, 100)
+                print(f"\n{Fore.CYAN}  📊 ANALISANDO OS {len(lista_reis)} REIS DE 20...{Style.RESET_ALL}")
                 conferir_jogos(df, lista_reis, ultimos_n=n)
+                if titulos:
+                    labels = ", ".join(f"J{i+1:02d}={t}" for i, t in enumerate(titulos))
+                    print(f"\n  {Fore.YELLOW}Nota: {labels}{Style.RESET_ALL}")
             else:
                 print(f"  {Fore.RED}❌ Arquivo de 20 DZ não encontrado.{Style.RESET_ALL}")
             pausar()
@@ -411,6 +473,7 @@ def main():
             path = base_dir / "data" / "hall_of_fame_20.json"
             if path.exists():
                 with open(path, "r", encoding="utf-8") as f: dados = json.load(f)
+                radar_atraso_reis(df, dados)
                 exibir_mapa_calor_reis(df, dados, ultimos_n=30)
             else:
                 print(f"  {Fore.RED}❌ Arquivo de 20 DZ não encontrado.{Style.RESET_ALL}")
@@ -423,6 +486,7 @@ def main():
             if path.exists():
                 with open(path, "r", encoding="utf-8") as f: dados = json.load(f)
                 listar_intervalos_reis(df, dados)
+                exibir_mapa_calor_reis(df, dados, ultimos_n=30)
             else:
                 print(f"  {Fore.RED}❌ Arquivo de 20 DZ não encontrado.{Style.RESET_ALL}")
             pausar()
@@ -446,6 +510,17 @@ def main():
                     print(f"\n  {Fore.GREEN}✅ 10 jogos gerados e registrados na memória!{Style.RESET_ALL}")
                 else:
                     print(f"  {Fore.RED}❌ Rei 15 (20 DZ) não encontrado no arquivo.{Style.RESET_ALL}")
+            pausar()
+
+        elif opcao == "76":
+            from pathlib import Path
+            bp = Path(__file__).parent
+            p = bp / "data" / "hall_of_fame_20.json"
+            if p.exists():
+                with open(p, "r", encoding="utf-8") as f: d = json.load(f)
+                exibir_resumo_ciclos_completo(df, d, label="20 DZ")
+            else:
+                print(f"  {Fore.RED}❌ Arquivo de 20 DZ não encontrado.{Style.RESET_ALL}")
             pausar()
 
         elif opcao == "0":
@@ -790,7 +865,7 @@ def main():
                         print(f"  Jogo {i}: {nums}  │  score: {r['score']:.4f}")
 
         # ── FECHAMENTO MATEMÁTICO ─────────────────────
-        elif opcao == "40":
+        elif opcao == "85":
             ranking = getattr(trainer, "_ultimo_ranking_preditivo", None)
             if not ranking:
                 ranking = carregar_ranking_do_csv(df)

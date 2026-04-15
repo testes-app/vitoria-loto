@@ -294,7 +294,24 @@ def radar_atraso_reis(df: pd.DataFrame, dados_hall: dict):
             status = f"⏳ Jejum: {r['atraso']} sorteios"
             bg = ""
         
-        dz_str = " ".join(f"{d:02d}" for d in r["dezenas"])
+        # Calcular Ciclo para colorir dezenas (Igual ao Caçador de Ciclo)
+        vistos = set()
+        for s in lista_sorteios:
+            hits = s & dezenas_rei
+            for h in hits:
+                if vistos == dezenas_rei: vistos = set()
+                vistos.add(h)
+        faltantes = dezenas_rei - vistos
+        
+        # Formatar dezenas com cores de ciclo
+        dz_formatted = []
+        for d in r["dezenas"]:
+            if d in faltantes:
+                dz_formatted.append(f"{Back.RED}{Fore.WHITE}{d:02d}{Style.RESET_ALL}")
+            else:
+                dz_formatted.append(f"{Fore.GREEN}{d:02d}{Style.RESET_ALL}")
+        dz_str = " ".join(dz_formatted)
+
         print(f"  {Fore.YELLOW}👑 {r['titulo']:12}{Style.RESET_ALL} │ {Fore.CYAN}Média: {r['media']:.1f}{Style.RESET_ALL} │ {cor}{status}{Style.RESET_ALL}")
         print(f"  └─ {dz_str}\n")
 
@@ -302,6 +319,9 @@ def radar_atraso_reis(df: pd.DataFrame, dados_hall: dict):
         print(f"  {Fore.MAGENTA}💡 ESTRATÉGIA:{Style.RESET_ALL}")
         print(f"  Dê preferência aos jogos com {Fore.RED}MAIOR JEJUM{Style.RESET_ALL}. A estatística")
         print(f"  indica que a tendência de retorno aumenta a cada sorteio falho.")
+    
+    print(f"\n  {Back.RED}  {Style.RESET_ALL} = Dezenas Pendentes (Faltam no Ciclo)")
+    print(f"  {Fore.GREEN}00{Style.RESET_ALL} = Dezenas de Reforço (Já saíram no Ciclo)")
 
 
 def listar_intervalos_reis(df: pd.DataFrame, dados_hall: dict):
