@@ -82,7 +82,30 @@
 
         .sorteio-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.05); }
         
-        ::-webkit-scrollbar { width: 6px; }
+        /* Estilos do Mapa de Calor Premium */
+        .mapa-container { overflow-x: auto; border-radius: 0 0 20px 20px; background: rgba(0,0,0,0.2); }
+        .mapa-table { width: 100%; border-collapse: separate; border-spacing: 0; font-size: 0.7rem; text-align: center; color: var(--text-muted); }
+        .mapa-table th { 
+            position: sticky; top: 0; background: #0a121e; z-index: 10; 
+            padding: 10px 5px; border-bottom: 1px solid var(--panel-border); font-weight: 700;
+        }
+        .mapa-table td { padding: 8px 4px; border-bottom: 1px solid rgba(255,255,255,0.02); font-family: 'JetBrains Mono', monospace; transition: all 0.2s; }
+        .mapa-table tr:hover td { background: rgba(255,255,255,0.03); color: #fff; }
+
+        /* Intensidades */
+        .cell-low { opacity: 0.4; }
+        .cell-mid { color: var(--text); opacity: 0.8; }
+        .cell-win { font-weight: 800; border-radius: 4px; }
+        .cell-jackpot { 
+            background: linear-gradient(135deg, #ffd700, #ff8c00); 
+            color: #000 !important; font-weight: 900; 
+            box-shadow: 0 0 15px rgba(255, 215, 0, 0.4);
+            border-radius: 4px;
+        }
+
+        .border-right { border-right: 1px solid var(--panel-border) !important; }
+        
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
         ::-webkit-scrollbar-thumb { background: var(--panel-border); border-radius: 10px; }
     </style>
 </head>
@@ -138,17 +161,26 @@
 
         <!-- ELITE: MAPA DE CALOR POR PONTOS -->
         <div class="full-width">
-            <div class="card-title">🔥 Mapa de Calor por Pontos — Desempenho nos Últimos 30 Sorteios</div>
-            <div class="card" style="padding: 0; overflow: hidden;">
-                <table style="width: 100%; border-collapse: collapse; font-size: 0.8rem; text-align: center;">
-                    <thead style="background: rgba(255,255,255,0.05);">
+            <div class="card-title">🔥 Mapa de Calor por Pontos — Desempenho Unificado (17-20 DZ)</div>
+            <div class="card mapa-container" style="padding: 0;">
+                <table class="mapa-table">
+                    <thead style="background: rgba(255,255,255,0.05); border-bottom: 1px solid var(--panel-border);">
                         <tr>
-                            <th style="padding: 12px; color: var(--text-muted);">CONCURSO</th>
-                            <th style="padding: 12px; color: var(--accent);">REI 15</th>
-                            <th style="padding: 12px; color: var(--accent);">REI 14</th>
-                            <th style="padding: 12px; color: var(--accent);">REI 13</th>
-                            <th style="padding: 12px; color: var(--accent);">REI 12</th>
-                            <th style="padding: 12px; color: var(--accent);">REI 11</th>
+                            <th rowspan="2" style="padding: 12px; border-right: 1px solid var(--panel-border);">CONC.</th>
+                            <th colspan="5" style="padding: 8px; color: #00d4ff; border-right: 1px solid var(--panel-border);">ELITE 17</th>
+                            <th colspan="5" style="padding: 8px; color: #7fff00; border-right: 1px solid var(--panel-border);">ELITE 18</th>
+                            <th colspan="5" style="padding: 8px; color: #ffcc00; border-right: 1px solid var(--panel-border);">ELITE 19</th>
+                            <th colspan="5" style="padding: 8px; color: #ff4d4d;">ELITE 20</th>
+                        </tr>
+                        <tr>
+                            <!-- 17 -->
+                            <th style="padding: 4px; color: #00d4ff88;">R15</th><th style="padding: 4px; color: #00d4ff88;">R14</th><th style="padding: 4px; color: #00d4ff88;">R13</th><th style="padding: 4px; color: #00d4ff88;">R12</th><th style="padding: 4px; border-right: 1px solid var(--panel-border); color: #00d4ff88;">R11</th>
+                            <!-- 18 -->
+                            <th style="padding: 4px; color: #7fff0088;">R15</th><th style="padding: 4px; color: #7fff0088;">R14</th><th style="padding: 4px; color: #7fff0088;">R13</th><th style="padding: 4px; color: #7fff0088;">R12</th><th style="padding: 4px; border-right: 1px solid var(--panel-border); color: #7fff0088;">R11</th>
+                            <!-- 19 -->
+                            <th style="padding: 4px; color: #ffcc0088;">R15</th><th style="padding: 4px; color: #ffcc0088;">R14</th><th style="padding: 4px; color: #ffcc0088;">R13</th><th style="padding: 4px; color: #ffcc0088;">R12</th><th style="padding: 4px; border-right: 1px solid var(--panel-border); color: #ffcc0088;">R11</th>
+                            <!-- 20 -->
+                            <th style="padding: 4px; color: #ff4d4d88;">R15</th><th style="padding: 4px; color: #ff4d4d88;">R14</th><th style="padding: 4px; color: #ff4d4d88;">R13</th><th style="padding: 4px; color: #ff4d4d88;">R12</th><th style="padding: 4px; color: #ff4d4d88;">R11</th>
                         </tr>
                     </thead>
                     <tbody id="mapa-pontos-body">
@@ -265,22 +297,44 @@
 
             cacheData = { elite, hof };
             
-            // Render Mapa Pontos
+            // Render Mapa Pontos Unificado (17-20)
             const mapaBody = document.getElementById('mapa-pontos-body');
             if(mapaBody && mapaPontos) {
                 mapaBody.innerHTML = '';
+                const elites = ["17", "18", "19", "20"];
+                const colors = { "17": [0, 212, 255], "18": [127, 255, 0], "19": [255, 204, 0], "20": [255, 77, 77] };
+                const limiares = { "17": 12, "18": 12, "19": 13, "20": 14 };
+
                 mapaPontos.forEach(row => {
                     const tr = document.createElement('tr');
-                    tr.style.borderBottom = '1px solid rgba(255,255,255,0.03)';
-                    let cells = `<td style="padding:10px; font-family:'JetBrains Mono'; color:var(--text-muted);">${row.concurso}</td>`;
-                    ['15', '14', '13', '12', '11'].forEach(k => {
-                        const v = row.pontos[k];
-                        let color = 'var(--text-muted)';
-                        let weight = '400';
-                        if(v >= 13) { color = 'var(--accent)'; weight = '800'; }
-                        else if(v >= 11) { color = 'var(--success)'; weight = '700'; }
-                        cells += `<td style="padding:10px; color:${color}; font-weight:${weight}; font-family:'JetBrains Mono';">${String(v).padStart(2,'0')} pts</td>`;
+                    let cells = `<td style="padding:10px; font-family:'JetBrains Mono'; font-weight:700; border-right: 1px solid var(--panel-border); color:var(--text-muted);">${row.concurso}</td>`;
+                    
+                    elites.forEach(e => {
+                        const pts = row.pontos[e];
+                        const rgb = colors[e];
+                        const limiar = limiares[e];
+                        
+                        ['15', '14', '13', '12', '11'].forEach(k => {
+                            const v = pts[k] || 0;
+                            let className = "cell-low";
+                            let inlineStyle = `color: rgba(${rgb[0]},${rgb[1]},${rgb[2]}, 0.5);`;
+
+                            if(v >= 15) {
+                                className = "cell-jackpot";
+                                inlineStyle = "";
+                            } else if(v >= limiar) {
+                                className = "cell-win";
+                                inlineStyle = `background: rgba(${rgb[0]},${rgb[1]},${rgb[2]}, 0.4); color: #fff; box-shadow: inset 0 0 10px rgba(${rgb[0]},${rgb[1]},${rgb[2]}, 0.3);`;
+                            } else if(v >= 11) {
+                                className = "cell-mid";
+                                inlineStyle = `background: rgba(${rgb[0]},${rgb[1]},${rgb[2]}, 0.1); color: rgba(${rgb[0]},${rgb[1]},${rgb[2]}, 1);`;
+                            }
+
+                            const borderClass = k === '11' ? 'border-right' : '';
+                            cells += `<td class="${className} ${borderClass}" style="${inlineStyle}">${v}</td>`;
+                        });
                     });
+                    
                     tr.innerHTML = cells;
                     mapaBody.appendChild(tr);
                 });

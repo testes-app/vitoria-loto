@@ -142,52 +142,73 @@ class AuditorSupremo:
         
         return set(range(1, 26)) - vistos
 
-    def gerar_veredito(self):
+    def gerar_veredito(self, usar_termica: bool = False):
         atrasos_gerais = self.calcular_atrasos()
         heat_geral = self.calcular_heat()
         ciclo_geral_pendentes = self.calcular_ciclo_geral()
         radar_ciclos = Counter()
         detalhes_convergencia = {}
         status_velocidade = {}
-
-        halls = [("17 DZ", self.hall_17), ("18 DZ", self.hall_18)]
         
-        for label, dados in halls:
+        # Mapa de Calor Integrado (Se solicitado)
+        termica = {}
+        if usar_termica:
+            from src.analysis.stats import calcular_mapa_calor_pontos_pro
+            dados_halls = {"17": self.hall_17, "18": self.hall_18, "19": self.hall_19, "20": self.hall_20}
+            res_calor = calcular_mapa_calor_pontos_pro(self.df, dados_halls)
+            # Calcular média de pontos nos últimos 10 sorteios para cada rei
+            ultimos_10 = res_calor[:10]
+            for elite in ["17", "18", "19", "20"]:
+                termica[elite] = {}
+                for k in ["15", "14", "13", "12", "11"]:
+                    pts_total = sum(d["pontos"][elite].get(k, 0) for d in ultimos_10)
+                    termica[elite][k] = pts_total / 10 if ultimos_10 else 0
+
+        halls = [("17", self.hall_17), ("18", self.hall_18), ("19", self.hall_19), ("20", self.hall_20)]
+        
+        for elite, dados in halls:
             for k, rei in dados.items():
                 target = rei["dezenas"]
                 res = self.analisar_ciclo_interno(target)
-                vel = self.calcular_velocidade_media(target)
-                idx_atual = res["concursos_no_ciclo"] - 1
-                if idx_atual >= 0 and "medias" in vel:
-                    esperado = sum(vel["medias"][:idx_atual+1])
-                    visto = len(res["vistos"])
-                    diff = visto - esperado
-                    status_velocidade[k] = {
-                        "status": "🐢 LENTO" if diff < -1.5 else ("🚀 RÁPIDO" if diff > 1.5 else "⚖️ MÉDIA"),
-                        "pressao": abs(diff) if diff < 0 else 0
-                    }
+                
+                # Bônus de Temperatura (Opção 80)
+                bonus_termico = 0
+                if usar_termica and elite in termica and k in termica[elite]:
+                    media_pts = termica[elite][k]
+                    # Se o Rei está pontuando bem (acima de 11.5 de média), ele é "Quente"
+                    if media_pts >= 12.0: bonus_termico = 15
+                    elif media_pts >= 11.0: bonus_termico = 8
+                
+                # Bônus de Maturidade de Ciclo
+                bonus_maturidade = 0
+                n_faltam = len(res["pendentes"])
+                if 1 <= n_faltam <= 3:
+                    bonus_maturidade = 20 # Alvo maduro!
+                elif n_faltam == 0:
+                    bonus_maturidade = -10 # Ciclo acabou de fechar, resfriando.
 
                 for p in res["pendentes"]:
-                    radar_ciclos[p] += 1
+                    # O score de cada dezena agora leva em conta a performance do grupo que a contém
+                    radar_ciclos[p] += (12 + bonus_termico + bonus_maturidade)
                     if p not in detalhes_convergencia: detalhes_convergencia[p] = []
                     detalhes_convergencia[p].append(f"{rei['titulo']}")
 
         ranking_convergencia = []
         for d in range(1, 26):
-            peso_ciclo = radar_ciclos.get(d, 0)
+            total_pontos_ciclo = radar_ciclos.get(d, 0)
             peso_atraso = atrasos_gerais.get(d, 0)
             peso_heat = heat_geral.get(d, 0)
             
-            # Sincronia Oficial: Se falta no ciclo geral de 25, ganha bônus de peso
-            bonus_ciclo_geral = 25 if d in ciclo_geral_pendentes else 0
+            bonus_ciclo_geral = 30 if d in ciclo_geral_pendentes else 0
             
-            score = (peso_ciclo * 12) + (min(peso_atraso, 5) * 6) + (peso_heat * 4) + bonus_ciclo_geral
+            # Cálculo Final da Suplemacia
+            score = total_pontos_ciclo + (min(peso_atraso, 5) * 6) + (peso_heat * 4) + bonus_ciclo_geral
             
             if score > 0:
                 ranking_convergencia.append({
                     "dezena": d,
                     "score": score,
-                    "qtd_ciclos": peso_ciclo,
+                    "qtd_ciclos": radar_ciclos.get(d, 0) // 12, # Qtd original aproximada
                     "atraso": peso_atraso,
                     "heat": peso_heat,
                     "sincronia": d in ciclo_geral_pendentes,
@@ -342,6 +363,96 @@ class AuditorSupremo:
 
         print(f"\n  {Fore.GREEN}★ Dica: Dezenas em VERDE estão no Ciclo Geral.{Style.RESET_ALL} │ {Fore.RED}{Style.BRIGHT}●{Style.RESET_ALL} = Dezenas Ultra-Master (+10 Reis)")
         print(f"  {Fore.MAGENTA}{'═'*120}{Style.RESET_ALL}")
+
+def exibir_suplemacia_ia(df, base_path):
+    """
+    Novo relatório (Opção 90) que mostra o Super Filtro resultante da fusão 60 + 80.
+    """
+    auditor = AuditorSupremo(df, base_path)
+    veredito = auditor.gerar_veredito(usar_termica=True)
+    
+    print(f"\n{Fore.YELLOW}╔{'═'*80}╗")
+    print(f"║ 🧠 SUPER FILTRO IA SUPREMO v1.0 — FUSÃO TÉRMICA & CONVERGÊNCIA             ║")
+    print(f"╚{'═'*80}╝{Style.RESET_ALL}")
+    
+    print(f"\n  {Fore.CYAN}🎯 PADRÃO DE OURO IDENTIFICADO (TOP 18 DEZENAS):{Style.RESET_ALL}")
+    
+    top_18 = veredito[:18]
+    # Formatação em grade 6x3
+    for i in range(0, 18, 6):
+        bloco = top_18[i:i+6]
+        line = "  "
+        for d in bloco:
+            score_color = Fore.YELLOW if d['score'] > 200 else (Fore.GREEN if d['score'] > 100 else Fore.WHITE)
+            line += f"{score_color}{d['dezena']:02d}{Style.RESET_ALL} (S:{int(d['score']):<3})   "
+        print(line)
+
+    print(f"\n  {Fore.MAGENTA}📊 RAIO-X DOS TOP 5 ALVOS:{Style.RESET_ALL}")
+    for d in veredito[:5]:
+        sinc = f"{Fore.GREEN}[SINCRO]{Style.RESET_ALL}" if d['sincronia'] else ""
+        print(f"  {Fore.WHITE}Dezena {d['dezena']:02d}{Style.RESET_ALL} │ Score: {Fore.YELLOW}{d['score']}{Style.RESET_ALL} │ Ciclos: {d['qtd_ciclos']} │ Fontes: {', '.join(d['fontes'][:3])} {sinc}")
+
+    # Gerar Filtro sugerido
+    dezenas_filtro = [d['dezena'] for d in veredito[:19]]
+    print(f"\n  {Fore.CYAN}🛡️  SUPER FILTRO SUGERIDO:{Style.RESET_ALL}")
+    print(f"  Minimo de 11 dezenas do conjunto: {sorted(dezenas_filtro)}")
+
+def gerar_jogos_suplemacia(df, base_path, n_jogos=10):
+    """
+    Gera jogos baseados no ranking de suplemacia (Opção 91).
+    Usa fixas de score alto e completa com o top 19.
+    """
+    from src.analysis.stats import exibir_jogos
+    from src.analysis.memoria import registrar_jogos_memoria
+    from src.data.database import ultimo_concurso
+    import random
+
+    # Identificar o próximo concurso alvo
+    prox_conc = ultimo_concurso() + 1
+
+    auditor = AuditorSupremo(df, base_path)
+    veredito = auditor.gerar_veredito(usar_termica=True)
+    
+    # Dezenas com Score acima de 150 são consideradas FIXAS
+    fixas = [d['dezena'] for d in veredito if d['score'] >= 150]
+    # Se tivermos mais de 11 fixas, pegamos as top 11 para garantir variabilidade
+    if len(fixas) > 11: fixas = fixas[:11]
+    
+    # Pool de dezenas (as top 19 do ranking)
+    pool = [d['dezena'] for d in veredito[:19]]
+    candidatos = [d for d in pool if d not in fixas]
+    
+    jogos = []
+    print(f"\n{Fore.CYAN}🚀 GERANDO {n_jogos} JOGOS DA SUPREMACIA IA...{Style.RESET_ALL}")
+    print(f"  {Fore.YELLOW}Base Fixa ({len(fixas)} dezenas): {fixas}{Style.RESET_ALL}")
+    
+    intentos = 0
+    while len(jogos) < n_jogos and intentos < 500:
+        intentos += 1
+        # Escolher dezenas para completar 15
+        precisa = 15 - len(fixas)
+        if precisa > len(candidatos): 
+             # Fallback: usar todas as dezenas disponíveis no banco se o pool for pequeno
+             pool_completo = list(range(1,26))
+             sorteados = random.sample([d for d in pool_completo if d not in fixas], precisa)
+        else:
+             sorteados = random.sample(candidatos, precisa)
+             
+        jogo = sorted(fixas + sorteados)
+        
+        # Validar DNA básico (Pares e Soma)
+        ok, _ = auditor.validar_dna(jogo)
+        if ok and jogo not in jogos:
+            jogos.append(jogo)
+
+    if jogos:
+        exibir_jogos(jogos, f"JOGOS GERADOS — SUPREMACIA IA (PARA CONCURSO {prox_conc})")
+        registrar_jogos_memoria(jogos, concurso=prox_conc)
+        print(f"\n  {Fore.GREEN}✅ {len(jogos)} jogos registrados para o Concurso {prox_conc}!{Style.RESET_ALL}")
+    else:
+        print(f"  {Fore.RED}❌ Falha ao encontrar combinações válidas com o DNA selecionado.{Style.RESET_ALL}")
+    
+    return jogos
 
 def rodar_auditoria_suprema(df, base_path):
     auditor = AuditorSupremo(df, base_path)

@@ -110,6 +110,9 @@ def menu_principal():
 {Fore.CYAN}  ── CONFIGURAÇÕES E UTILITÁRIOS ──────────────────{Style.RESET_ALL}
  80. 🗺️ Mapa de Calor Unificado (Todos os Reis)
  86. 🔥 Mapa de Calor por Pontos (Últimos 30)
+ 90. 🧠 SUPER FILTRO IA SUPREMO (Auditor + Térmico)
+ 91. 🎲 GERAR JOGOS — SUPREMACIA IA (Top 19)
+ 100. 🚀 PROJETO AGI NRO 1 — O CONTROLADOR (Auto-Pilot Master)
 
 {Fore.RED}  0.  🚪 Sair{Style.RESET_ALL}
 """)

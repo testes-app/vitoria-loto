@@ -1170,74 +1170,91 @@ def calcular_stats_completos_reis(df: pd.DataFrame, dados_halls: dict):
 def calcular_mapa_calor_pontos_pro(df: pd.DataFrame, dados_halls: dict):
     """
     Motor de Calor por Pontos v1.0: 
-    Calcula quantos pontos cada REI (15,14,13,12,11) faria nos últimos 30 sorteios.
+    Calcula acertos de todos os Reis (15..11) para todas as elites (17,18,19,20).
     """
     historico = df.tail(30).copy().sort_values('concurso', ascending=False)
     num_cols = [f"n{i:02d}" for i in range(1, 16)]
     
-    # Extrair os Reis (usando a Elite 18 como padrão para o mapa de comparação, 
-    # ou podemos fazer para qualquer uma. O usuário sugeriu REI 15..11)
-    # Vamos pegar da Elite 18 que é a mais balanceada.
-    elite_ref = "18"
-    if elite_ref not in dados_halls: 
-        # Fallback para a primeira disponível
-        elite_ref = list(dados_halls.keys())[0] if dados_halls else None
-        
-    if not elite_ref: return []
-    
-    reis_targets = {}
-    for k in ["15", "14", "13", "12", "11"]:
-        if k in dados_halls[elite_ref]:
-            reis_targets[k] = set(dados_halls[elite_ref][k]["dezenas"])
-            
+    elites = ["17", "18", "19", "20"]
+    targets = {e: {} for e in elites}
+    for e in elites:
+        if e in dados_halls:
+            for k in ["15", "14", "13", "12", "11"]:
+                if k in dados_halls[e]:
+                    targets[e][k] = set(dados_halls[e][k]["dezenas"])
+
     resultados = []
     for _, row in historico.iterrows():
         sorteio = set(int(row[c]) for c in num_cols)
-        conc = int(row['concurso'])
-        
-        linha = {"concurso": conc, "pontos": {}}
-        for k, target in reis_targets.items():
-            acertos = len(target & sorteio)
-            linha["pontos"][k] = acertos
-            
+        linha = {
+            "concurso": int(row['concurso']),
+            "pontos": {e: {k: len(t & sorteio) for k, t in targets[e].items()} for e in elites}
+        }
         resultados.append(linha)
         
     return resultados
 
 def exibir_mapa_calor_pontos_reis(df: pd.DataFrame, dados_halls: dict):
     """
-    Opção 86: Exibe o Mapa de Calor de Pontos no Terminal.
+    Opção 86: Exibe o Mapa de Calor de Pontos Unificado no Terminal.
     """
     dados = calcular_mapa_calor_pontos_pro(df, dados_halls)
     if not dados:
         print(f"{Fore.RED}Erro: Dados dos Reis não encontrados.{Style.RESET_ALL}")
         return
 
-    print(f"\n{Fore.CYAN}╔{'═'*62}╗")
-    print(f"║ 📊 MAPA DE CALOR: ÚLTIMOS 30 SORTEIOS (ELITE DOS REIS)     ║")
-    print(f"╚{'═'*62}╝{Style.RESET_ALL}")
+    CORES = {"17": Fore.CYAN, "18": Fore.GREEN, "19": Fore.YELLOW, "20": Fore.LIGHTRED_EX}
+    width = 138
+    print(f"\n{Fore.WHITE}┌{'─'*width}┐")
+    print(f"│ {'📊 PAINEL DE PERFORMANCE DOS REIS — ÚLTIMOS 30 SORTEIOS (ELITE)'.center(width - 2)} │")
+    print(f"└{'─'*width}┘{Style.RESET_ALL}")
+
+    # Cabeçalho
+    h1 = f"          │"
+    h2 = f"  CONC.   │"
+    for e in ["17", "18", "19", "20"]:
+        h1 += f"{CORES[e]}{' ' * 10}{e} DEZENAS{' ' * 12}{Style.RESET_ALL}│"
+        for k in ["15", "14", "13", "12", "11"]:
+            h2 += f" {CORES[e]}R{k}{Style.RESET_ALL}    "
+        h2 = h2.rstrip() + " │"
     
-    print(f"  CONC.  │ REI 15 │ REI 14 │ REI 13 │ REI 12 │ REI 11 │")
-    print(f"  {'─'*7}┼─{'─'*6}─┼─{'─'*6}─┼─{'─'*6}─┼─{'─'*6}─┼─{'─'*6}─┤")
+    print(h1)
+    print(h2)
+    print("  " + "─" * (len(h2) - 3))
 
     for d in dados:
         conc = d["concurso"]
         pts = d["pontos"]
         
-        # Marcar se algum pontuou 11+
-        prefix = f"{Fore.GREEN}X{Style.RESET_ALL} " if any(v >= 11 for v in pts.values()) else "  "
+        # Marcar se houve vitória (11+ acertos em qualquer elite)
+        ganhou_qualquer = False
+        for e in pts:
+            for v in pts[e].values():
+                if v >= 11:
+                    ganhou_qualquer = True
+                    break
+            if ganhou_qualquer: break
+            
+        prefix = f"{Fore.RED}✗ {Style.RESET_ALL}" if not ganhou_qualquer else "  "
+        linha = f"{prefix}{conc:<7} │"
         
-        linha = f"{prefix}{conc:<6} │"
-        for k in ["15", "14", "13", "12", "11"]:
-            val = pts.get(k, 0)
-            cor = Fore.GREEN if val >= 11 else Fore.WHITE
-            if val >= 13: cor = Fore.YELLOW + Style.BRIGHT
-            linha += f" {cor}{val:02d} pts{Style.RESET_ALL} │"
+        for e in ["17", "18", "19", "20"]:
+            bloco = ""
+            for k in ["15", "14", "13", "12", "11"]:
+                val = pts[e].get(k, 0)
+                if val >= 15: cor = Fore.YELLOW + Style.BRIGHT
+                elif val >= 11: cor = CORES[e] + Style.BRIGHT
+                else: cor = CORES[e] + Style.DIM
+                bloco += f" {cor}{val:02d}pts{Style.RESET_ALL} "
+            linha += bloco + "│"
             
         print(linha)
 
-    print(f"  {'─'*63}")
-    print(f"  {Fore.YELLOW}Legenda:{Style.RESET_ALL} {Fore.GREEN}PONTUOU (11+ pts){Style.RESET_ALL} │ {Fore.WHITE}Sem Ponto (<11 pts){Style.RESET_ALL}")
+    print("  " + "─" * (len(h2) - 3))
+    print(f"  {Fore.LIGHTBLACK_EX}Legenda de Performance:{Style.RESET_ALL}")
+    print(f"  {Fore.YELLOW}15pts (MÁX){Style.RESET_ALL} │ {Style.BRIGHT}Brilhante (Elite){Style.RESET_ALL} │ {Style.NORMAL}Normal (Premios 11+){Style.RESET_ALL} │ {Style.DIM}Apagado (<11pts){Style.RESET_ALL}")
+    print(f"  {Fore.YELLOW}Cores: {CORES['17']}17DZ{Style.RESET_ALL} │ {CORES['18']}18DZ{Style.RESET_ALL} │ {CORES['19']}19DZ{Style.RESET_ALL} │ {CORES['20']}20DZ{Style.RESET_ALL}")
+
 def exibir_radar_unificado_reis(df: pd.DataFrame, dados_halls: dict):
     """
     Radar Unificado v3.2: Compara o atraso (jejum) atual de todos os Reis.

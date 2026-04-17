@@ -7,6 +7,11 @@ import json
 from pathlib import Path
 from colorama import Fore, Back, Style, init
 
+# Garante suporte a UTF-8 no terminal Windows
+if sys.platform == "win32":
+    sys.stdout.reconfigure(encoding='utf-8')
+    sys.stderr.reconfigure(encoding='utf-8')
+
 init(autoreset=True)
 
 from src.config import JOBS_PATH
@@ -24,7 +29,7 @@ from src.analysis.stats import (
     exibir_ciclo_unificado, exibir_resumo_ciclos_completo,
     exibir_resumo_ciclos_unificado
 )
-from src.analysis.auditor_supremo import rodar_auditoria_suprema
+from src.analysis.auditor_supremo import rodar_auditoria_suprema, exibir_suplemacia_ia, gerar_jogos_suplemacia
 from src.analysis.turbo import (
     rodar_score_master, rodar_indice_preditivo, gerar_jogos_15_do_preditivo,
     gerar_jogos_cacada_ciclo, mostrar_ultimo_concurso, exibir_ranking_csv,
@@ -39,6 +44,7 @@ from src.models.trainer import Trainer
 from src.ui.menu import (
     limpar, menu_principal, pausar, pedir_numero, pedir_string, cabecalho
 )
+from src.analysis.agi_core import rodar_agi_controlador
 
 def exibir_hall_fama(dados, label, df=None):
     """Exibe o visual elegante do Hall da Fama para qualquer elite com status de ciclo."""
@@ -538,6 +544,21 @@ def main():
                 if p.exists(): halls[elite] = json.loads(p.read_text(encoding="utf-8"))
             if halls: exibir_mapa_calor_pontos_reis(df, halls)
             else: print(f"  {Fore.RED}❌ Nenhum dado de Hall of Fame encontrado.{Style.RESET_ALL}")
+            pausar()
+        
+        elif opcao == "100":
+            rodar_agi_controlador(df, Path(__file__).parent)
+            pausar()
+        
+        elif opcao == "91":
+            from src.analysis.auditor_supremo import gerar_jogos_suplemacia
+            n = pedir_numero("  Quantos jogos gerar? (1-50): ", 1, 50)
+            gerar_jogos_suplemacia(df, Path(__file__).parent, n_jogos=n)
+            pausar()
+        
+        elif opcao == "90":
+            from src.analysis.auditor_supremo import exibir_suplemacia_ia
+            exibir_suplemacia_ia(df, Path(__file__).parent)
             pausar()
 
         elif opcao == "0":

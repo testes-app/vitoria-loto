@@ -47,9 +47,14 @@ def init_memoria():
 
 
 def registrar_jogo(dezenas: list, concurso: int = 0,
-                   data: str = None, dia_semana: str = None) -> int:
+                    data: str = None, dia_semana: str = None, conn=None) -> int:
     """Registra um jogo apostado. Retorna o ID."""
-    init_memoria()
+    fechar_ao_sair = False
+    if conn is None:
+        init_memoria()
+        conn = get_conn()
+        fechar_ao_sair = True
+
     if data is None:
         data = datetime.now().strftime("%d/%m/%Y")
     if dia_semana is None:
@@ -58,22 +63,30 @@ def registrar_jogo(dezenas: list, concurso: int = 0,
     semana = datetime.now().strftime("%Y-W%W")
     dz_str = "-".join(f"{n:02d}" for n in sorted(dezenas))
 
-    conn = get_conn()
     cursor = conn.execute("""
         INSERT INTO memoria_jogos
         (data, concurso, dia_semana, dezenas, custo, saldo, semana)
         VALUES (?, ?, ?, ?, 3.50, -3.50, ?)
     """, [data, concurso, dia_semana, dz_str, semana])
     jogo_id = cursor.lastrowid
-    conn.commit()
-    conn.close()
+    
+    if fechar_ao_sair:
+        conn.commit()
+        conn.close()
     return jogo_id
 
 
-def registrar_jogos_memoria(jogos: list):
-    """Registra uma lista de jogos apostados de uma vez."""
-    for jogo in jogos:
-        registrar_jogo(jogo)
+def registrar_jogos_memoria(jogos: list, concurso: int = 0):
+    """Registra uma lista de jogos apostados de uma vez (BATCH MODE)."""
+    if not jogos: return
+    init_memoria()
+    conn = get_conn()
+    try:
+        for jogo in jogos:
+            registrar_jogo(jogo, concurso=concurso, conn=conn)
+        conn.commit()
+    finally:
+        conn.close()
 
 
 def conferir_resultado(jogo_id: int, acertos: int):
